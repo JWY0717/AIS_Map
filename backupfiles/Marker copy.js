@@ -2,23 +2,16 @@ import { Feature } from 'ol';
 import { Point } from 'ol/geom';
 import { Style, Icon } from 'ol/style';
 
-const svgCode = `
-<svg width="120" height="167" viewBox="0 0 120 167" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M11.117 152.487L60 16.282L108.883 152.487L63.0857 121.447L60 119.356L56.9143 121.447L11.117 152.487Z" fill="#B9D800" stroke="#C90000" stroke-width="11"/>
-</svg>
-`;
-
 export default class Marker {
   constructor(goem, cog, map) {
     this.feature = new Feature({
       geometry: new Point(goem),
     });
 
-    const svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgCode)}`;
-
     this.style = new Style({
       image: new Icon({
-        src: svgUrl,
+        
+        src: './assets/mark.svg',
         scale: this.calculateMarkerScale(map.getView().getZoom()),
         rotation: cog * (Math.PI / 180),
         rotateWithView: true,

@@ -28,7 +28,9 @@ const map = new Map({
 });
 
 const goem = [14363620.688750563, 4174472.488498304]; // 마커의 초기 위치 좌표
-const marker = new Marker(goem, map); // Marker 인스턴스 생성
+const sog = 10; // 노트 단위의 속도
+const cog = 140; // AIS 신호에서 수신된 방향 정보
+const marker = new Marker(goem, cog, map); // Marker 인스턴스 생성
 
 map.addLayer(
   new VectorLayer({
@@ -39,11 +41,7 @@ map.addLayer(
 );
 
 function animateMarker() {
-  const sog = 10; // 노트 단위의 속도
-  const cog = 30; // AIS 신호에서 수신된 방향 정보
-
   marker.updatePosition(sog, cog, map);
-
   requestAnimationFrame(animateMarker);
 }
 

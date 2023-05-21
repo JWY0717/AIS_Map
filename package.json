@@ -15,5 +15,6 @@
         "build": "vite build",
         "deploy": "gh-pages -d dist",
         "predeploy": "npm run build"
-    }
+    },
+    "homepage": "https://Bogol-E.github.io/AIS_Map"
 }

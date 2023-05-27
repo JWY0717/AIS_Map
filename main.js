@@ -36,6 +36,16 @@ const markerData = [
   { goem: [14366620.688750563, 4172772.488498304], sog: 50, cog: 290 },
 ];
 
+while (markerData.length < 500) {
+  let fakeShip = {
+    goem: [14463620.688750563 - Math.random() * 500000, 4175472.488498304 - Math.random() * 200000],
+    sog: Math.random() * 60,
+    cog: Math.random() * 360
+  }
+  markerData.push(fakeShip);
+}
+
+
 const markers = markerData.map(data => new Marker(data.goem, data.cog, map));
 
 markers.forEach((marker, index) => {
@@ -46,8 +56,8 @@ markers.forEach((marker, index) => {
       }),
     })
   );
-  marker.sog = markerData[index].sog; 
-  marker.cog = markerData[index].cog; 
+  marker.sog = markerData[index].sog;
+  marker.cog = markerData[index].cog;
 });
 
 function animateMarkers() {

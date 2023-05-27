@@ -1,6 +1,6 @@
 import { Feature } from 'ol';
 import { Point } from 'ol/geom';
-import { Style, Icon } from 'ol/style';
+import { Style, Icon, Text, Fill } from 'ol/style';
 
 const svgCode = `
 <svg width="120" height="167" viewBox="0 0 120 167" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -16,20 +16,29 @@ export default class Marker {
 
     const svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgCode)}`;
 
+    const text = new Text({
+      text: 'ship',
+      font: 'bold 13px sans-serif',
+      fill: new Fill({ color: 'red' }),
+      offsetY: 25, // 텍스트의 Y축 위치 조정
+    });
+
     this.style = new Style({
       image: new Icon({
         src: svgUrl,
         scale: this.calculateMarkerScale(map.getView().getZoom()),
         rotation: cog * (Math.PI / 180),
         rotateWithView: true,
-        anchor: [0.5, 1],
+        anchor: [0.5, 0.5],
         anchorXUnits: 'fraction',
         anchorYUnits: 'fraction',
       }),
+      text: text, 
     });
 
     this.feature.setStyle(this.style);
   }
+  
 
   getFeature() {
     return this.feature;
@@ -71,8 +80,8 @@ export default class Marker {
     const scaleFactor = Math.pow(scaleRatio, zoomLevel - minZoom);
     let scale = baseScale * scaleFactor;
 
-    const minScale = 0.1;
-    const maxScale = 0.5;
+    const minScale = 0.001;
+    const maxScale = 0.3;
     scale = Math.max(minScale, Math.min(maxScale, scale));
 
     return scale;

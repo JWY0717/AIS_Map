@@ -38,12 +38,20 @@ const markerData = [
 
 while (markerData.length < 2000) {
   let fakeShip = {
-    goem: [14513620.688750563 - Math.random() * 550000, 4388472.488498304 - Math.random() * 400000],
-    sog: Math.random() * 200,
+    goem: [14364120.688750563 - Math.random() * 10, 4173772.488498304 - Math.random() * 10],
+    sog: Math.random() * 300,
     cog: Math.random() * 360
   }
   markerData.push(fakeShip);
 }
+// while (markerData.length < 2000) {
+//   let fakeShip = {
+//     goem: [14513620.688750563 - Math.random() * 550000, 4388472.488498304 - Math.random() * 400000],
+//     sog: Math.random() * 200,
+//     cog: Math.random() * 360
+//   }
+//   markerData.push(fakeShip);
+// }
 
 const markers = markerData.map(data => new Marker(data.goem, data.cog, map));
 markers.forEach((marker, index) => {
@@ -68,7 +76,7 @@ animateMarkers()
 map.getView().on('change:resolution', function (event) {
   var zoomLevel = map.getView().getZoom();
 
-  if (zoomLevel <= 12) {
+  if (zoomLevel <= 13) {
     if (animationRequestId) {
       cancelAnimationFrame(animationRequestId);
       animationRequestId = undefined;

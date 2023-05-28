@@ -9,20 +9,19 @@ const svgCode = `
 `;
 
 export default class Marker {
-  constructor(goem, cog, map) {
+  constructor(goem, sog, cog, map) {
+    this.sog = sog;
+    this.cog = cog;
     this.feature = new Feature({
       geometry: new Point(goem),
     });
-
     const svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgCode)}`;
-
-    const text = new Text({
+    this.shipName = new Text({
       text: 'ship',
-      font: 'bold 13px sans-serif',
+      font: 'bold 14px sans-serif',
       fill: new Fill({ color: 'red' }),
       offsetY: 25, // 텍스트의 Y축 위치 조정
     });
-
     this.style = new Style({
       image: new Icon({
         src: svgUrl,
@@ -33,12 +32,11 @@ export default class Marker {
         anchorXUnits: 'fraction',
         anchorYUnits: 'fraction',
       }),
-      text: text, 
+      text: this.shipName,
     });
-
     this.feature.setStyle(this.style);
   }
-  
+
 
   getFeature() {
     return this.feature;
@@ -46,18 +44,16 @@ export default class Marker {
 
   updatePosition(sog, cog, map) {
     const coordinates = this.feature.getGeometry().getCoordinates();
-
     const pixelDistance = this.calculatePixelDistance(sog, map);
-
     const angleRad = (450 - cog) * (Math.PI / 180);
     const deltaX = Math.cos(angleRad) * pixelDistance;
     const deltaY = Math.sin(angleRad) * pixelDistance;
     const newPosition = [coordinates[0] + deltaX, coordinates[1] + deltaY];
-
     this.feature.getGeometry().setCoordinates(newPosition);
-
     const currentZoom = map.getView().getZoom();
     this.style.getImage().setScale(this.calculateMarkerScale(currentZoom));
+    this.shipName.setOffsetY(this.calculateOffsetY(currentZoom));
+    this.shipName.setFont(this.caculateFontSize(currentZoom));
   }
 
   calculatePixelDistance(sog, map) {
@@ -74,16 +70,24 @@ export default class Marker {
     const baseScale = 0.02;
     const minZoom = 8;
     const maxZoom = 19;
-    const scaleRatio = 1.35;
-
+    const scaleRatio = 1.3;
     const zoomLevel = Math.max(minZoom, Math.min(maxZoom, zoom));
     const scaleFactor = Math.pow(scaleRatio, zoomLevel - minZoom);
     let scale = baseScale * scaleFactor;
-
     const minScale = 0.001;
     const maxScale = 0.3;
     scale = Math.max(minScale, Math.min(maxScale, scale));
-
     return scale;
+  }
+  calculateOffsetY(zoom) {
+    let offsetY = (zoom - 10) * 4 + 4;
+    const minScale = 5;
+    const maxScale = 40;
+    offsetY = Math.max(minScale, Math.min(maxScale, offsetY));
+    return offsetY;
+  }
+
+  caculateFontSize(zoom) {
+    return `bold ${zoom*3-25}px sans-serif`
   }
 }

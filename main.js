@@ -35,26 +35,24 @@ const markerData = [
   { goem: [14364320.688750563, 4172772.488498304], sog: 40, cog: 340 },
   { goem: [14366620.688750563, 4172772.488498304], sog: 50, cog: 290 },
 ];
-
-while (markerData.length < 2000) {
+while (markerData.length < 1900) {
   let fakeShip = {
-    goem: [14364120.688750563 - Math.random() * 10, 4173772.488498304 - Math.random() * 10],
-    sog: Math.random() * 300,
+    goem: [14513620.688750563 - Math.random() * 550000, 4388472.488498304 - Math.random() * 400000],
+    sog: Math.random() * 50,
     cog: Math.random() * 360
   }
   markerData.push(fakeShip);
 }
-// while (markerData.length < 2000) {
-//   let fakeShip = {
-//     goem: [14513620.688750563 - Math.random() * 550000, 4388472.488498304 - Math.random() * 400000],
-//     sog: Math.random() * 200,
-//     cog: Math.random() * 360
-//   }
-//   markerData.push(fakeShip);
-// }
-
-const markers = markerData.map(data => new Marker(data.goem, data.cog, map));
-markers.forEach((marker, index) => {
+while (markerData.length < 2000) {
+  let fakeShip = {
+    goem: [14364120.688750563 - Math.random() * 10, 4173772.488498304 - Math.random() * 10],
+    sog: Math.random() * 500,
+    cog: Math.random() * 360
+  }
+  markerData.push(fakeShip);
+}
+const markers = markerData.map(data => new Marker(data.goem, data.sog, data.cog, map));
+markers.forEach((marker) => {
   map.addLayer(
     new VectorLayer({
       source: new VectorSource({
@@ -62,8 +60,6 @@ markers.forEach((marker, index) => {
       }),
     })
   );
-  marker.sog = markerData[index].sog;
-  marker.cog = markerData[index].cog;
 });
 
 let animationRequestId
@@ -76,7 +72,7 @@ animateMarkers()
 map.getView().on('change:resolution', function (event) {
   var zoomLevel = map.getView().getZoom();
 
-  if (zoomLevel <= 13) {
+  if (zoomLevel <= 12) {
     if (animationRequestId) {
       cancelAnimationFrame(animationRequestId);
       animationRequestId = undefined;
@@ -85,9 +81,6 @@ map.getView().on('change:resolution', function (event) {
       });
     }
   } else {
-    markers.forEach(marker => {
-      marker.style.getText().setOffsetY(calculateOffsetY(zoomLevel));
-    });
     if (!animationRequestId) {
       animateMarkers();
       markers.forEach(marker => {
@@ -97,10 +90,3 @@ map.getView().on('change:resolution', function (event) {
   }
 });
 
-function calculateOffsetY(zoomLevel) {
-  let offsetY = (zoomLevel-10)*4+4;
-  const minScale = 5;
-  const maxScale = 40;
-  offsetY = Math.max(minScale, Math.min(maxScale, offsetY));
-  return offsetY;
-}

@@ -6,7 +6,7 @@ import View from 'ol/View';
 import { transform } from 'ol/proj';
 import { Vector as VectorLayer } from 'ol/layer';
 import { Vector as VectorSource } from 'ol/source';
-import Marker from './Marker';
+import * as PIXI from 'pixi.js';
 
 const extent = [13967488.396764, 3840850.295080, 14482255.536724, 4668126.023685];
 // 대한민국 남한의 경계 좌표 범위 (EPSG:3857)
@@ -26,6 +26,12 @@ const map = new Map({
     extent: extent,
   }),
 });
+
+// Pixi.js Application 생성
+const app = new PIXI.Application();
+
+// OpenLayers의 Map을 Pixi.js Application의 view로 설정
+map.getViewport().appendChild(app.view);
 
 const markerData = [
   { goem: [14363620.688750563, 4174472.488498304], sog: 20, cog: 140 },
@@ -51,53 +57,53 @@ while (markerData.length < 2000) {
   }
   markerData.push(fakeShip);
 }
-const markers = markerData.map(data => new Marker(data.goem, data.sog, data.cog, map));
-markers.forEach((marker) => {
-  map.addLayer(
-    new VectorLayer({
-      source: new VectorSource({
-        features: [marker.getFeature()],
-      }),
-    })
-  );
-});
-map.on('postcompose', animateMarkers);
-let animationPaused = false;
 
-map.getView().on('change:resolution', function (event) {
-  var zoomLevel = map.getView().getZoom();
-  markers.forEach(marker => marker.updateSize(map));
+class Marker {
+  constructor(coordinates, sog, cog) {
+    this.coordinates = coordinates;
+    this.sog = sog;
+    this.cog = cog;
+    this.position = map.getPixelFromCoordinate(coordinates); // 수정된 부분
 
-  if (zoomLevel <= 12) {
-    if (!animationPaused) {
-      pauseAnimation();
-    }
-  } else {
-    if (animationPaused) {
-      resumeAnimation();
-    }
+    this.container = new PIXI.Container();
+    this.marker = new PIXI.Graphics();
+    this.marker.beginFill(0xff0000);
+    this.marker.drawCircle(0, 0, 5);
+    this.marker.endFill();
+    this.container.addChild(this.marker);
+    this.text = new PIXI.Text('SOG: ' + this.sog.toFixed(2), {
+      fontSize: 12,
+      fill: 'rgba(255, 0, 0, 1)',
+    });
+    this.text.position.x = -15;
+    this.text.position.y = -15;
+    this.container.addChild(this.text);
+    app.stage.addChild(this.container);
+    this.updatePosition(this.sog, this.cog);
   }
-});
 
-function animateMarkers(event) {
-  if (!animationPaused) {
-    markers.forEach(marker => marker.updatePosition(marker.sog, marker.cog, map));
-    map.render();
+  updatePosition(sog, cog) {
+    this.sog = sog;
+    this.cog = cog;
+    const view = map.getView();
+    const resolution = view.getResolution();
+    const rotation = view.getRotation();
+    const sin = Math.sin(-rotation);
+    const cos = Math.cos(-rotation);
+    const dx = this.sog * resolution * cos;
+    const dy = this.sog * resolution * sin;
+    this.position[0] += dx;
+    this.position[1] += dy;
+    const coordinate = map.getCoordinateFromPixel(this.position);
+    this.coordinates = coordinate;
+    this.container.position.x = this.position[0];
+    this.container.position.y = this.position[1];
+    this.text.text = 'SOG: ' + this.sog.toFixed(2);
   }
 }
 
-function pauseAnimation() {
-  animationPaused = true;
-  map.un('postcompose', animateMarkers);
-  markers.forEach(marker => {
-    marker.style.getText().getFill().setColor('rgba(0, 0, 0, 0)');
-  });
-}
 
-function resumeAnimation() {
-  animationPaused = false;
-  markers.forEach(marker => {
-    marker.style.getText().getFill().setColor('rgba(255, 0, 0, 1)');
-  });
-  map.on('postcompose', animateMarkers);
-}
+const markers = markerData.map(data => new Marker(data.goem, data.sog, data.cog));
+markers.forEach(marker => {
+  marker.updatePosition(marker.sog, marker.cog);
+});

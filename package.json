@@ -3,6 +3,7 @@
     "dependencies": {
         "gh-pages": "^5.0.0",
         "ol": "7.3.0",
+        "pixi.js": "^7.2.4",
         "proj4": "^2.9.0",
         "request": "^2.88.2",
         "wkx": "^0.5.0"

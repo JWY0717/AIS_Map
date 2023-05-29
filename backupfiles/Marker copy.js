@@ -42,6 +42,13 @@ export default class Marker {
     return this.feature;
   }
 
+  updateSize(map){
+    const currentZoom = map.getView().getZoom();
+    this.style.getImage().setScale(this.calculateMarkerScale(currentZoom));
+    this.shipName.setOffsetY(this.calculateOffsetY(currentZoom));
+    this.shipName.setFont(this.caculateFontSize(currentZoom));
+  }
+
   updatePosition(sog, cog, map) {
     const coordinates = this.feature.getGeometry().getCoordinates();
     const pixelDistance = this.calculatePixelDistance(sog, map);
@@ -50,10 +57,7 @@ export default class Marker {
     const deltaY = Math.sin(angleRad) * pixelDistance;
     const newPosition = [coordinates[0] + deltaX, coordinates[1] + deltaY];
     this.feature.getGeometry().setCoordinates(newPosition);
-    const currentZoom = map.getView().getZoom();
-    this.style.getImage().setScale(this.calculateMarkerScale(currentZoom));
-    this.shipName.setOffsetY(this.calculateOffsetY(currentZoom));
-    this.shipName.setFont(this.caculateFontSize(currentZoom));
+    
   }
 
   calculatePixelDistance(sog, map) {

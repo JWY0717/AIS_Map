@@ -20,8 +20,8 @@ const map = new Map({
   target: 'map',
   view: new View({
     center: transform([129.0306, 35.0779], 'EPSG:4326', 'EPSG:3857'),
-    zoom: 15,
-    maxZoom: 19,
+    zoom: 14,
+    maxZoom: 20,
     minZoom: 8,
     extent: extent,
   }),

@@ -86,7 +86,7 @@ export default class Marker {
     const passTime = (now - this.time) / 1000; // 현재 시간과 마커의 시간 차이 (초 단위)
     // if (passTime > 0.05) { // 랜더링 성능제한
       const coordinates = this.feature.getGeometry().getCoordinates();
-      const speed = sog * 1.60934 * 1000 / 3600; // 초당 이동 속도 (미터 기준)
+      const speed = sog * 1.852 * 1000 / 3600; // 초당 이동 속도 (미터 기준)
       const distance = speed * passTime; // 이동해야 할 거리 (미터 기준)
       const angleRad = (90 - cog) * (Math.PI / 180);
       const deltaX = Math.cos(angleRad) * distance;
@@ -106,7 +106,7 @@ export default class Marker {
     const scaleFactor = Math.pow(scaleRatio, zoomLevel - minZoom);
     let scale = baseScale * scaleFactor;
     const minScale = 0.001;
-    const maxScale = 0.3;
+    const maxScale = 0.25;
     scale = Math.max(minScale, Math.min(maxScale, scale));
     return scale;
   }
@@ -119,7 +119,10 @@ export default class Marker {
   }
 
   caculateFontSize(zoom) {
-    return ` ${(zoom - 12) * 2 + 12}px Tahoma`
+    const minFont = 10;
+    const maxFont = 20;
+    const fontSize = Math.max(minFont, Math.min(maxFont, (zoom - 12) * 2 + 12));
+    return ` ${fontSize}px Tahoma`
   }
 
   updateSize(map) {

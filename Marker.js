@@ -105,7 +105,7 @@ export default class Marker {
     const zoomLevel = Math.max(minZoom, Math.min(maxZoom, zoom));
     const scaleFactor = Math.pow(scaleRatio, zoomLevel - minZoom);
     let scale = baseScale * scaleFactor;
-    const minScale = 0.001;
+    const minScale = 0.05;
     const maxScale = 0.25;
     scale = Math.max(minScale, Math.min(maxScale, scale));
     return scale;

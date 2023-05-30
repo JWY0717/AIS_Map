@@ -28,59 +28,26 @@ const map = new Map({
 });
 
 let startTime = Date.now()
-const markerData = [
-  { goem: [14363620.688750563, 4174472.488498304], sog: 20, cog: 140, time: startTime },
-  { goem: [14363320.688750563, 4174772.488498304], sog: 10, cog: 20, time: startTime },
-  { goem: [14363020.688750563, 4174072.488498304], sog: 15, cog: 60, time: startTime },
-  { goem: [14364120.688750563, 4173772.488498304], sog: 10, cog: 10, time: startTime },
-  { goem: [14364320.688750563, 4172772.488498304], sog: 40, cog: 340, time: startTime },
-  { goem: [14366620.688750563, 4172772.488498304], sog: 50, cog: 290, time: startTime },
-];
-while (markerData.length < 1900) {
-  let fakeShip = {
-    goem: [14513620.688750563 - Math.random() * 550000, 4388472.488498304 - Math.random() * 400000],
-    sog: Math.random() * 30,
-    cog: Math.random() * 360,
-    time: startTime
+const markerData = [];
+
+function makeFakeShip ( right, up, count, reange) {
+  for (let i =0 ; i<count; i++) {
+    let fakeShip = {
+      goem: [ 14363620.688750563 + right - Math.random() * reange, 4171752.3092421135 + up - Math.random() * reange ],
+      sog: Math.random() * 30,
+      cog: Math.random() * 360,
+      time: startTime
+    }
+    markerData.push(fakeShip)
   }
-  markerData.push(fakeShip);
 }
-while (markerData.length < 1930) {
-  let fakeShip = {
-    goem: [14367120.688750563 - Math.random() * 3000, 4173772.488498304 - Math.random() * 3000],
-    sog: Math.random() * 30,
-    cog: Math.random() * 360,
-    time: startTime
-  }
-  markerData.push(fakeShip);
-}
-while (markerData.length < 1960) {
-  let fakeShip = {
-    goem: [14364120.688750563 - Math.random() * 3000, 4170272.488498304 - Math.random() * 3000],
-    sog: Math.random() * 30,
-    cog: Math.random() * 360,
-    time: startTime
-  }
-  markerData.push(fakeShip);
-}
-while (markerData.length < 1990) {
-  let fakeShip = {
-    goem: [14365620.688750563 - Math.random() * 2000, 4173072.488498304 - Math.random() * 3000],
-    sog: Math.random() * 30,
-    cog: Math.random() * 360,
-    time: startTime
-  }
-  markerData.push(fakeShip);
-}
-while (markerData.length < 2050) {
-  let fakeShip = {
-    goem: [14368120.688750563 - Math.random() * 3000, 4171772.488498304 - Math.random() * 3000],
-    sog: Math.random() * 30,
-    cog: Math.random() * 360,
-    time: startTime
-  }
-  markerData.push(fakeShip);
-}
+makeFakeShip(1500,2000,10,1000)
+makeFakeShip(2900,1000,20,3000)
+makeFakeShip(2000,-2000,50,4000)
+makeFakeShip(-1000,-2000,50,4000)
+makeFakeShip(6000,-1000,50,4000)
+makeFakeShip(120000,350000,3000, 600000)
+
 
 const markers = markerData.map(data => new Marker(data.goem, data.sog*10, data.cog, map, data.time));
 markers.forEach((marker) => {

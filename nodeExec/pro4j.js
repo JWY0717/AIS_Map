@@ -1,7 +1,7 @@
 const proj4 = require("proj4");
 
 // 소스 좌표와 대상 좌표 체계를 정의합니다.
-const sourceCoordinates = [129.0306, 35.0779];
+const sourceCoordinates = [129.0306, 35.0579];
 const sourceProjection = proj4.defs("EPSG:4326");
 const targetProjection = proj4.defs("EPSG:3857");
 

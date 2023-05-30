@@ -59,7 +59,7 @@ export default class Marker {
     let zoom = map.getView().getZoom();
     this.shipName = new Text({
       text: words[Math.floor(Math.random() * words.length)],
-      font: this.caculateFontSize(),
+      font: this.caculateFontSize(zoom),
       fill: new Fill({ color: this.stroke }),
       offsetY: this.calculateOffsetY(zoom),
     });
@@ -84,7 +84,7 @@ export default class Marker {
 
   updatePosition(sog, cog, now) {
     const passTime = (now - this.time) / 1000; // 현재 시간과 마커의 시간 차이 (초 단위)
-    if (passTime > 0.05) {
+    // if (passTime > 0.05) { // 랜더링 성능제한
       const coordinates = this.feature.getGeometry().getCoordinates();
       const speed = sog * 1.60934 * 1000 / 3600; // 초당 이동 속도 (미터 기준)
       const distance = speed * passTime; // 이동해야 할 거리 (미터 기준)
@@ -94,7 +94,7 @@ export default class Marker {
       const newCoordinates = [coordinates[0] + deltaX, coordinates[1] + deltaY];
       this.feature.getGeometry().setCoordinates(newCoordinates);
       this.time = now;
-    }
+    // }
   }
 
   calculateMarkerScale(zoom) {
@@ -111,7 +111,7 @@ export default class Marker {
     return scale;
   }
   calculateOffsetY(zoom) {
-    let offsetY = (zoom - 11) * 5.5 - 7;
+    let offsetY = (zoom - 11) * 5.5 - 3;
     const minScale = 5;
     const maxScale = 40;
     offsetY = Math.max(minScale, Math.min(maxScale, offsetY));
@@ -119,7 +119,7 @@ export default class Marker {
   }
 
   caculateFontSize(zoom) {
-    return ` ${zoom * 3 - 30}px Tahoma`
+    return ` ${(zoom - 12) * 2 + 12}px Tahoma`
   }
 
   updateSize(map) {

@@ -54,6 +54,25 @@ while (markerData.length < 2000) {
   }
   markerData.push(fakeShip);
 }
+while (markerData.length < 2100) {
+  let fakeShip = {
+    goem: [14363120.688750563 - Math.random() * 10, 4172772.488498304 - Math.random() * 10],
+    sog: Math.random() * 500,
+    cog: Math.random() * 360,
+    time: startTime
+  }
+  markerData.push(fakeShip);
+}
+while (markerData.length < 2200) {
+  let fakeShip = {
+    goem: [14365120.688750563 - Math.random() * 10, 4172772.488498304 - Math.random() * 10],
+    sog: Math.random() * 500,
+    cog: Math.random() * 360,
+    time: startTime
+  }
+  markerData.push(fakeShip);
+}
+
 const markers = markerData.map(data => new Marker(data.goem, data.sog, data.cog, map, data.time));
 markers.forEach((marker) => {
   map.addLayer(
@@ -73,7 +92,7 @@ function animateMarkers() {
 }
 animateMarkers()
 
-// 디바운스 함수 정의
+// 디바운스
 function debounce(func, delay) {
   let timeoutId;
   return function (...args) {
@@ -84,7 +103,6 @@ function debounce(func, delay) {
   };
 }
 
-// 디바운스된 이벤트 핸들러
 const debouncedEventHandler = debounce(function(event) {
   const zoomLevel = map.getView().getZoom();
   markers.forEach(marker => marker.updateSize(map));
@@ -105,8 +123,7 @@ const debouncedEventHandler = debounce(function(event) {
       });
     }
   }
-}, 200); // 적절한 딜레이 시간을 설정하세요 (ms)
+}, 200); 
 
-// 디바운스된 이벤트 핸들러를 등록
 map.getView().on('change:resolution', debouncedEventHandler);
 

@@ -111,10 +111,10 @@ export default class Marker {
     return scale;
   }
   calculateOffsetY(zoom) {
-    let offsetY = (zoom - 11) * 5.5 - 3;
-    const minScale = 5;
-    const maxScale = 40;
-    offsetY = Math.max(minScale, Math.min(maxScale, offsetY));
+    let offsetY = (zoom - 11) * 4.5 - 1;
+    const minOff = 5;
+    const maxOff = 30;
+    offsetY = Math.max(minOff, Math.min(maxOff, offsetY));
     return offsetY;
   }
 

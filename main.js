@@ -19,7 +19,7 @@ const map = new Map({
   ],
   target: 'map',
   view: new View({
-    center: transform([129.0306, 35.0779], 'EPSG:4326', 'EPSG:3857'),
+    center: transform([129.0306, 35.0579], 'EPSG:4326', 'EPSG:3857'),
     zoom: 14,
     maxZoom: 20,
     minZoom: 8,
@@ -39,41 +39,50 @@ const markerData = [
 while (markerData.length < 1900) {
   let fakeShip = {
     goem: [14513620.688750563 - Math.random() * 550000, 4388472.488498304 - Math.random() * 400000],
-    sog: Math.random() * 50,
+    sog: Math.random() * 30,
     cog: Math.random() * 360,
     time: startTime
   }
   markerData.push(fakeShip);
 }
-while (markerData.length < 2000) {
+while (markerData.length < 1930) {
   let fakeShip = {
-    goem: [14364120.688750563 - Math.random() * 10, 4173772.488498304 - Math.random() * 10],
-    sog: Math.random() * 500,
+    goem: [14367120.688750563 - Math.random() * 3000, 4173772.488498304 - Math.random() * 3000],
+    sog: Math.random() * 30,
     cog: Math.random() * 360,
     time: startTime
   }
   markerData.push(fakeShip);
 }
-while (markerData.length < 2100) {
+while (markerData.length < 1960) {
   let fakeShip = {
-    goem: [14363120.688750563 - Math.random() * 10, 4172772.488498304 - Math.random() * 10],
-    sog: Math.random() * 500,
+    goem: [14364120.688750563 - Math.random() * 3000, 4170272.488498304 - Math.random() * 3000],
+    sog: Math.random() * 30,
     cog: Math.random() * 360,
     time: startTime
   }
   markerData.push(fakeShip);
 }
-while (markerData.length < 2200) {
+while (markerData.length < 1990) {
   let fakeShip = {
-    goem: [14365120.688750563 - Math.random() * 10, 4172772.488498304 - Math.random() * 10],
-    sog: Math.random() * 500,
+    goem: [14365620.688750563 - Math.random() * 2000, 4173072.488498304 - Math.random() * 3000],
+    sog: Math.random() * 30,
+    cog: Math.random() * 360,
+    time: startTime
+  }
+  markerData.push(fakeShip);
+}
+while (markerData.length < 2050) {
+  let fakeShip = {
+    goem: [14368120.688750563 - Math.random() * 3000, 4171772.488498304 - Math.random() * 3000],
+    sog: Math.random() * 30,
     cog: Math.random() * 360,
     time: startTime
   }
   markerData.push(fakeShip);
 }
 
-const markers = markerData.map(data => new Marker(data.goem, data.sog, data.cog, map, data.time));
+const markers = markerData.map(data => new Marker(data.goem, data.sog*10, data.cog, map, data.time));
 markers.forEach((marker) => {
   map.addLayer(
     new VectorLayer({

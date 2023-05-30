@@ -4,8 +4,8 @@ import { Style, Icon, Text, Fill } from 'ol/style';
 
 const red = "#C90000";
 const orange = "#FF8000";
-const yellow = "#FFFF00";
-const green = "#00FF00";
+const yellow = "#FAFF00";
+const green = "#107100";
 const blue = "#0000FF";
 const indigo = "#4B0082";
 const violet = "#8B00FF";
@@ -34,8 +34,8 @@ export default class Marker {
       geometry: new Point(goem),
     });
     let fill, stroke;
-    sog > 400 ? fill = red : sog > 300 ? fill = orange : sog > 200 ? fill = yellow : sog > 100 ?
-      fill = green : sog > 50 ? fill = blue : sog > 20 ? fill = indigo : sog > 5 ? fill = violet : fill = black;
+    sog > 250 ? fill = red : sog > 210 ? fill = orange : sog > 170 ? fill = yellow : sog > 130 ?
+      fill = green : sog > 90 ? fill = blue : sog > 60 ? fill = indigo : sog > 30 ? fill = violet : fill = black;
 
     let sh = Math.floor(cog) % 8
     sh == 0 ? stroke = red : sh == 1 ? stroke = orange : sh == 2 ? stroke = yellow : sh == 3 ?

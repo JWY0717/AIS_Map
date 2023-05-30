@@ -26,20 +26,19 @@ const words = [
   'oat', 'quinoa', 'rice', 'rye', 'sorghum', 'wheat', 'bagel', 'croissant']
 
 export default class Marker {
-  constructor(goem, sog, cog, map, time) {
+  constructor(goem, sog, cog, map) {
     this.sog = sog;
     this.cog = cog;
-    this.time = time;
     this.feature = new Feature({
       geometry: new Point(goem),
     });
     let fill, stroke;
-    sog > 400 ? fill = red : sog > 300 ? fill = orange : sog > 200 ? fill = yellow : sog > 100 ?
-      fill = green : sog > 50 ? fill = blue : sog > 20 ? fill = indigo : sog > 5 ? fill = violet : fill = black;
+    sog>400?fill=red:sog>300?fill=orange:sog>200?fill=yellow:sog>100?
+    fill=green:sog>50?fill=blue:sog>20?fill=indigo:sog>5?fill=violet:fill=black;
 
-    let sh = Math.floor(cog) % 8
-    sh == 0 ? stroke = red : sh == 1 ? stroke = orange : sh == 2 ? stroke = yellow : sh == 3 ?
-      stroke = green : sh == 4 ? stroke = blue : sh == 5 ? stroke = indigo : sh == 6 ? stroke = violet : stroke = black;
+    let sh = Math.floor(cog)%8
+    sh==0?stroke=red:sh==1?stroke=orange:sh==2?stroke=yellow:sh==3?
+    stroke=green:sh==4?stroke=blue:sh==5?stroke=indigo:sh==6?stroke=violet:stroke=black;
 
     let svgShip = `
     <svg width="120" height="167" viewBox="0 0 120 167" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -53,9 +52,9 @@ export default class Marker {
     `;
     this.stroke = stroke;
     this.fill = fill;
-    let svgUrl = ''
-    sog < 10 ? svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgStop)}` : svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgShip)}`;
-
+    let svgUrl=''
+    sog<10? svgUrl=`data:image/svg+xml;utf8,${encodeURIComponent(svgStop)}`:svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgShip)}`;
+    
     let zoom = map.getView().getZoom();
     this.shipName = new Text({
       text: words[Math.floor(Math.random() * words.length)],
@@ -78,23 +77,37 @@ export default class Marker {
     this.feature.setStyle(this.style);
   }
 
+
   getFeature() {
     return this.feature;
   }
 
-  updatePosition(sog, cog, now) {
-    const passTime = (now - this.time) / 1000; // 현재 시간과 마커의 시간 차이 (초 단위)
-    if (passTime > 0.05) {
-      const coordinates = this.feature.getGeometry().getCoordinates();
-      const speed = sog * 1.60934 * 1000 / 3600; // 초당 이동 속도 (미터 기준)
-      const distance = speed * passTime; // 이동해야 할 거리 (미터 기준)
-      const angleRad = (90 - cog) * (Math.PI / 180);
-      const deltaX = Math.cos(angleRad) * distance;
-      const deltaY = Math.sin(angleRad) * distance;
-      const newCoordinates = [coordinates[0] + deltaX, coordinates[1] + deltaY];
-      this.feature.getGeometry().setCoordinates(newCoordinates);
-      this.time = now;
-    }
+  updateSize(map) {
+    const currentZoom = map.getView().getZoom();
+    this.style.getImage().setScale(this.calculateMarkerScale(currentZoom));
+    this.shipName.setOffsetY(this.calculateOffsetY(currentZoom));
+    this.shipName.setFont(this.caculateFontSize(currentZoom));
+  }
+
+  updatePosition(sog, cog, map) {
+    const coordinates = this.feature.getGeometry().getCoordinates();
+    const pixelDistance = this.calculatePixelDistance(sog, map);
+    const angleRad = (450 - cog) * (Math.PI / 180);
+    const deltaX = Math.cos(angleRad) * pixelDistance;
+    const deltaY = Math.sin(angleRad) * pixelDistance;
+    const newPosition = [coordinates[0] + deltaX, coordinates[1] + deltaY];
+    this.feature.getGeometry().setCoordinates(newPosition);
+
+  }
+
+  calculatePixelDistance(sog, map) {
+    const view = map.getView();
+    const resolution = view.getResolution();
+    const dpi = 25.4 / 0.28;
+    const metersPerUnit = view.getProjection().getMetersPerUnit();
+    const meterDistance = (sog * metersPerUnit * resolution) / dpi;
+    const pixelDistance = meterDistance / resolution;
+    return pixelDistance;
   }
 
   calculateMarkerScale(zoom) {
@@ -120,12 +133,5 @@ export default class Marker {
 
   caculateFontSize(zoom) {
     return ` ${zoom * 3 - 30}px Tahoma`
-  }
-
-  updateSize(map) {
-    const currentZoom = map.getView().getZoom();
-    this.style.getImage().setScale(this.calculateMarkerScale(currentZoom));
-    this.shipName.setOffsetY(this.calculateOffsetY(currentZoom));
-    this.shipName.setFont(this.caculateFontSize(currentZoom));
   }
 }

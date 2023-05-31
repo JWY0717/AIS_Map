@@ -1,0 +1,10 @@
+OpenLayers 객체를 ol로 변경합니다.
+OpenLayers.Projection을 ol.proj.Projection으로 변경합니다.
+OpenLayers.LonLat을 ol.proj.fromLonLat로 변경하여 좌표를 변환합니다.
+maxResolution을 maxZoom으로 변경합니다.
+OlmsLayer를 layers: [OtmsLayer]로 수정하여 레이어를 설정합니다.
+OpenLayers.IMAGE_RELOAD_ATTEMPTS, OpenLayers.Util.onImageLoadErrorColor를 제거하고 대신 ol.Image.ImageTile.prototype.getLoadFunction을 사용하여 pink tiles 에러를 처리합니다.
+OpenLayers.Map을 ol.Map으로 변경합니다.
+new OpenLayers.Bounds를 new ol.View로 변경하여 뷰를 설정합니다.
+options.maxResolution을 제거하고 대신 maxZoom을 설정합니다.
+allOverlays를 제거하고 대신 loadTilesWhileAnimating 및 loadTilesWhileInteracting을 true로 설정하여 타일 로딩 전략을 변경합니다

@@ -19,74 +19,88 @@ const map = new Map({
   ],
   target: 'map',
   view: new View({
-    center: transform([129.0306, 35.0779], 'EPSG:4326', 'EPSG:3857'),
-    zoom: 15,
-    maxZoom: 19,
+    center: transform([129.0306, 35.0579], 'EPSG:4326', 'EPSG:3857'),
+    zoom: 14,
+    maxZoom: 20,
     minZoom: 8,
     extent: extent,
   }),
 });
 
-const markerData = [
-  { goem: [14363620.688750563, 4174472.488498304], sog: 20, cog: 140 },
-  { goem: [14363320.688750563, 4174772.488498304], sog: 10, cog: 20 },
-  { goem: [14363020.688750563, 4174072.488498304], sog: 15, cog: 60 },
-  { goem: [14364120.688750563, 4173772.488498304], sog: 10, cog: 10 },
-  { goem: [14364320.688750563, 4172772.488498304], sog: 40, cog: 340 },
-  { goem: [14366620.688750563, 4172772.488498304], sog: 50, cog: 290 },
-];
-while (markerData.length < 1900) {
-  let fakeShip = {
-    goem: [14513620.688750563 - Math.random() * 550000, 4388472.488498304 - Math.random() * 400000],
-    sog: Math.random() * 50,
-    cog: Math.random() * 360
+let startTime = Date.now()
+const markerData = [];
+
+function makeFakeShip ( right, up, count, reange) {
+  for (let i =0 ; i<count; i++) {
+    let fakeShip = {
+      goem: [ 14363620.688750563 + right - Math.random() * reange, 4171752.3092421135 + up - Math.random() * reange ],
+      sog: Math.random() * 30,
+      cog: Math.random() * 360,
+      time: startTime
+    }
+    markerData.push(fakeShip)
   }
-  markerData.push(fakeShip);
 }
-while (markerData.length < 2000) {
-  let fakeShip = {
-    goem: [14364120.688750563 - Math.random() * 10, 4173772.488498304 - Math.random() * 10],
-    sog: Math.random() * 500,
-    cog: Math.random() * 360
-  }
-  markerData.push(fakeShip);
-}
-const markers = markerData.map(data => new Marker(data.goem, data.sog, data.cog, map));
-markers.forEach((marker) => {
-  map.addLayer(
-    new VectorLayer({
-      source: new VectorSource({
-        features: [marker.getFeature()],
-      }),
-    })
-  );
+makeFakeShip(1500,2000,10,1000)
+makeFakeShip(2900,1000,20,3000)
+makeFakeShip(2000,-2000,50,4000)
+makeFakeShip(-1000,-2000,50,4000)
+makeFakeShip(6000,-1000,50,4000)
+makeFakeShip(120000,350000,3000, 600000)
+
+const markers = markerData.map(data => new Marker(data.goem, data.sog*10, data.cog, map, data.time));
+
+const vectorSource = new VectorSource();
+const vectorLayer = new VectorLayer({
+  source: vectorSource,
 });
+
+markers.forEach((marker) => {
+  const feature = marker.getFeature();
+  vectorSource.addFeature(feature);
+});
+map.addLayer(vectorLayer);
 
 let animationRequestId
 function animateMarkers() {
-  markers.forEach(marker => marker.updatePosition(marker.sog, marker.cog, map));
+  let nowTime = Date.now();
+  markers.forEach(marker => marker.updatePosition(marker.sog, marker.cog, nowTime));
   animationRequestId = requestAnimationFrame(animateMarkers);
 }
 animateMarkers()
 
-map.getView().on('change:resolution', function (event) {
-  var zoomLevel = map.getView().getZoom();
+// 디바운스
+function debounce(func, delay) {
+  let timeoutId;
+  return function (...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
+
+const debouncedEventHandler = debounce(function(event) {
+  const zoomLevel = map.getView().getZoom();
+  markers.forEach(marker => marker.updateSize(map));
 
   if (zoomLevel <= 12) {
     if (animationRequestId) {
       cancelAnimationFrame(animationRequestId);
       animationRequestId = undefined;
       markers.forEach(marker => {
-        marker.style.getText().getFill().setColor('rgba(0, 0, 0, 0)'); 
+        marker.style.getText().getFill().setColor('rgba(0, 0, 0, 0)');
       });
     }
   } else {
     if (!animationRequestId) {
       animateMarkers();
       markers.forEach(marker => {
-        marker.style.getText().getFill().setColor('rgba(255, 0, 0, 1)'); 
+        marker.style.getText().getFill().setColor(marker.stroke);
       });
     }
   }
-});
+}, 200); 
+
+map.getView().on('change:resolution', debouncedEventHandler);
 

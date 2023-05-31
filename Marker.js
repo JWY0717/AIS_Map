@@ -40,7 +40,7 @@ export default class Marker {
     let sh = Math.floor(cog) % 8
     sh == 0 ? stroke = red : sh == 1 ? stroke = orange : sh == 2 ? stroke = yellow : sh == 3 ?
       stroke = green : sh == 4 ? stroke = blue : sh == 5 ? stroke = indigo : sh == 6 ? stroke = violet : stroke = black;
-
+ 
     let svgShip = `
     <svg width="120" height="167" viewBox="0 0 120 167" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M11.117 152.487L60 16.282L108.883 152.487L63.0857 121.447L60 119.356L56.9143 121.447L11.117 152.487Z" fill="${fill}" stroke="${stroke}" stroke-width="11"/>

@@ -29,3 +29,7 @@
 >> - [ ] 운항 일지 저장
 >> - [ ] 게시판 생성. 운항일지 사진등 공유 기능
 >> - [ ] 구글 에드센스 광고
+
+```
+ npx rollup -c --bundleConfigAsCjs rollup.config.js
+```

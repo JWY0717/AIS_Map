@@ -48,17 +48,18 @@ makeFakeShip(-1000,-2000,50,4000)
 makeFakeShip(6000,-1000,50,4000)
 makeFakeShip(120000,350000,3000, 600000)
 
-
 const markers = markerData.map(data => new Marker(data.goem, data.sog*10, data.cog, map, data.time));
-markers.forEach((marker) => {
-  map.addLayer(
-    new VectorLayer({
-      source: new VectorSource({
-        features: [marker.getFeature()],
-      }),
-    })
-  );
+
+const vectorSource = new VectorSource();
+const vectorLayer = new VectorLayer({
+  source: vectorSource,
 });
+
+markers.forEach((marker) => {
+  const feature = marker.getFeature();
+  vectorSource.addFeature(feature);
+});
+map.addLayer(vectorLayer);
 
 let animationRequestId
 function animateMarkers() {

@@ -11,36 +11,24 @@ const indigo = "#4B0082";
 const violet = "#8B00FF";
 const black = "#000000";
 const white = "#FFFFFF";
-const words = [
-  'apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape',
-  'honeydew', 'kiwi', 'lemon', 'mango', 'nectarine', 'orange', 'peach',
-  'quince', 'raspberry', 'strawberry', 'tangerine', 'watermelon', 'apricot',
-  'blueberry', 'coconut', 'dragonfruit', 'grapefruit', 'huckleberry', 'jackfruit',
-  'kiwifruit', 'lime', 'mulberry', 'papaya', 'persimmon', 'plum', 'pomegranate',
-  'rhubarb', 'starfruit', 'tomato', 'ugli', 'yuzu', 'boysenberry', 'cranberry',
-  'durian', 'feijoa', 'guava', 'honeyberry', 'imbe', 'jabuticaba', 'kiwano',
-  'loquat', 'mandarin', 'nance', 'olive', 'pawpaw', 'quenepa', 'rambutan',
-  'soursop', 'tamarind', 'uvaia', 'vanilla', 'wampee', 'xigua', 'yumberry',
-  'zucchini', 'almond', 'cashew', 'chestnut', 'date', 'hazelnut', 'macadamia',
-  'pecan', 'pistachio', 'walnut', 'amaranth', 'barley', 'buckwheat', 'corn',
-  'oat', 'quinoa', 'rice', 'rye', 'sorghum', 'wheat', 'bagel', 'croissant']
 
 export default class Marker {
-  constructor(goem, sog, cog, map, time) {
+  constructor(shipName="unknown", shipType, cog, sog, posX, posY, time, map, vectorSource) {
+    this.render = true;
+    this.shipName = shipName 
     this.sog = sog;
     this.cog = cog;
     this.time = time;
     this.feature = new Feature({
-      geometry: new Point(goem),
+      geometry: new Point([posX, posY]),
     });
     let fill, stroke;
-    sog > 250 ? fill = red : sog > 210 ? fill = orange : sog > 170 ? fill = yellow : sog > 130 ?
-      fill = green : sog > 90 ? fill = blue : sog > 60 ? fill = indigo : sog > 30 ? fill = violet : fill = black;
+    sog > 25 ? fill = red : sog > 21 ? fill = orange : sog > 17 ? fill = yellow : sog > 13 ?
+      fill = green : sog > 9 ? fill = blue : sog > 6 ? fill = indigo : sog > 3 ? fill = violet : fill = black;
 
-    let sh = Math.floor(cog) % 8
-    sh == 0 ? stroke = red : sh == 1 ? stroke = orange : sh == 2 ? stroke = yellow : sh == 3 ?
-      stroke = green : sh == 4 ? stroke = blue : sh == 5 ? stroke = indigo : sh == 6 ? stroke = violet : stroke = black;
- 
+    shipType > 100 ? stroke = red : shipType > 90 ? stroke = orange : shipType > 80 ? stroke = yellow : shipType > 70 ?
+      stroke = green : shipType > 60 ? stroke = blue : shipType > 50 ? stroke = indigo : shipType > 30 ? stroke = violet : stroke = black;
+
     let svgShip = `
     <svg width="120" height="167" viewBox="0 0 120 167" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M11.117 152.487L60 16.282L108.883 152.487L63.0857 121.447L60 119.356L56.9143 121.447L11.117 152.487Z" fill="${fill}" stroke="${stroke}" stroke-width="11"/>
@@ -58,7 +46,7 @@ export default class Marker {
 
     let zoom = map.getView().getZoom();
     this.shipName = new Text({
-      text: words[Math.floor(Math.random() * words.length)],
+      text: shipName,
       font: this.caculateFontSize(zoom),
       fill: new Fill({ color: this.stroke }),
       offsetY: this.calculateOffsetY(zoom),
@@ -76,24 +64,21 @@ export default class Marker {
       text: this.shipName,
     });
     this.feature.setStyle(this.style);
-  }
-
-  getFeature() {
-    return this.feature;
+    vectorSource.addFeature(this.feature)
   }
 
   updatePosition(sog, cog, now) {
     const passTime = (now - this.time) / 1000; // 현재 시간과 마커의 시간 차이 (초 단위)
     // if (passTime > 0.05) { // 랜더링 성능제한
-      const coordinates = this.feature.getGeometry().getCoordinates();
-      const speed = sog * 1.852 * 1000 / 3600; // 초당 이동 속도 (미터 기준)
-      const distance = speed * passTime; // 이동해야 할 거리 (미터 기준)
-      const angleRad = (90 - cog) * (Math.PI / 180);
-      const deltaX = Math.cos(angleRad) * distance;
-      const deltaY = Math.sin(angleRad) * distance;
-      const newCoordinates = [coordinates[0] + deltaX, coordinates[1] + deltaY];
-      this.feature.getGeometry().setCoordinates(newCoordinates);
-      this.time = now;
+    const coordinates = this.feature.getGeometry().getCoordinates();
+    const speed = sog * 1.852 * 1000 / 3600; // 초당 이동 속도 (미터 기준)
+    const distance = speed * passTime; // 이동해야 할 거리 (미터 기준)
+    const angleRad = (90 - cog) * (Math.PI / 180);
+    const deltaX = Math.cos(angleRad) * distance;
+    const deltaY = Math.sin(angleRad) * distance;
+    const newCoordinates = [coordinates[0] + deltaX, coordinates[1] + deltaY];
+    this.feature.getGeometry().setCoordinates(newCoordinates);
+    this.time = now;
     // }
   }
 
@@ -122,13 +107,23 @@ export default class Marker {
     const minFont = 10;
     const maxFont = 20;
     const fontSize = Math.max(minFont, Math.min(maxFont, (zoom - 12) * 2 + 12));
-    return ` ${fontSize}px Tahoma`
+    return `${fontSize}px Tahoma`
   }
 
-  updateSize(map) {
-    const currentZoom = map.getView().getZoom();
-    this.style.getImage().setScale(this.calculateMarkerScale(currentZoom));
-    this.shipName.setOffsetY(this.calculateOffsetY(currentZoom));
-    this.shipName.setFont(this.caculateFontSize(currentZoom));
+  updateSize(zoom) {
+    this.style.getImage().setScale(this.calculateMarkerScale(zoom));
+    this.shipName.setOffsetY(this.calculateOffsetY(zoom));
+    this.shipName.setFont(this.caculateFontSize(zoom));
+  }
+
+  updateMarker(cog, sog, time) {
+    this.cog = cog;
+    this.sog = sog;
+    // this.time = time;
+  }
+
+  getFeature(){
+    this.render=false;
+    return this.feature;
   }
 }

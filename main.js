@@ -18,8 +18,8 @@ const map = new Map({
   ],
   target: 'map',
   view: new View({
-    center: transform([129.0306, 35.0579], 'EPSG:4326', 'EPSG:3857'),
-    zoom: 14,
+    center: [14377620, 4165752],
+    zoom: 11.5,
     maxZoom: 20,
     minZoom: 8,
     extent: extent,
@@ -33,7 +33,7 @@ const vectorLayer = new VectorLayer({
 map.addLayer(vectorLayer);
 
 const markers = new Array(new Marker(
-  'Bogol-E', 100, 150, 500, 14363620, 4171752, Date.now(), map, vectorSource
+  'Bogol-E', 100, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource
 ));
 
 const mkey = new Set([0]);
@@ -71,18 +71,11 @@ const debouncedEventHandler = debounce(function (event) {
     if (!animationPaused) {
       animationPaused = true;
       map.un('postcompose', animateMarkers);
-      for (let key of mkey) {
-        markers[key].style.getText().getFill().setColor('rgba(0, 0, 0, 0)');
-      }
     }
   } else {
     if (animationPaused) {
       map.on('postcompose', animateMarkers);
       animationPaused = false;
-      for (let key of mkey) {
-        let marker = markers[key]
-        marker.style.getText().getFill().setColor(marker.stroke);
-      }
     }
   }
 }, 200);
@@ -113,7 +106,7 @@ socket.onmessage = function (msg) {
       } else {
         mkey.add(key)
         markers[key] = new Marker(
-          ais.shipName, ais.shipType, ais.cog, ais.sog,
+          ais.shipName||"unKnown", ais.shipType, ais.cog, ais.sog,
           ais.posX, ais.posY, Date.now(), map, vectorSource)
       }
     }

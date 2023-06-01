@@ -13,7 +13,7 @@ const black = "#000000";
 const white = "#FFFFFF";
 
 export default class Marker {
-  constructor(shipName="unknown", shipType, cog, sog, posX, posY, time, map, vectorSource) {
+  constructor(shipName, shipType, cog, sog, posX, posY, time, map, vectorSource) {
     this.render = true;
     this.shipName = shipName 
     this.sog = sog;
@@ -23,11 +23,11 @@ export default class Marker {
       geometry: new Point([posX, posY]),
     });
     let fill, stroke;
-    sog > 25 ? fill = red : sog > 21 ? fill = orange : sog > 17 ? fill = yellow : sog > 13 ?
-      fill = green : sog > 9 ? fill = blue : sog > 6 ? fill = indigo : sog > 3 ? fill = violet : fill = black;
+    sog > 22 ? fill = red : sog > 17 ? fill = orange : sog > 13 ? fill = yellow : sog > 9 ?
+      fill = green : sog > 5 ? fill = blue : sog > 3 ? fill = indigo : sog > 1 ? fill = violet : fill = black;
 
-    shipType > 100 ? stroke = red : shipType > 90 ? stroke = orange : shipType > 80 ? stroke = yellow : shipType > 70 ?
-      stroke = green : shipType > 60 ? stroke = blue : shipType > 50 ? stroke = indigo : shipType > 30 ? stroke = violet : stroke = black;
+    shipType > 90 ? stroke = red : shipType > 80 ? stroke = orange : shipType > 70 ? stroke = yellow : shipType > 60 ?
+      stroke = green : shipType > 40 ? stroke = blue : shipType > 20 ? stroke = indigo : shipType > 1 ? stroke = violet : stroke = black;
 
     let svgShip = `
     <svg width="120" height="167" viewBox="0 0 120 167" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -42,13 +42,13 @@ export default class Marker {
     this.stroke = stroke;
     this.fill = fill;
     let svgUrl = ''
-    sog < 10 ? svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgStop)}` : svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgShip)}`;
+    sog < 2 ? svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgStop)}` : svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgShip)}`;
 
     let zoom = map.getView().getZoom();
     this.shipName = new Text({
       text: shipName,
       font: this.caculateFontSize(zoom),
-      fill: new Fill({ color: this.stroke }),
+      fill: new Fill({ color: this.caculateFontColor(zoom) }),
       offsetY: this.calculateOffsetY(zoom),
     });
     this.style = new Style({
@@ -85,7 +85,7 @@ export default class Marker {
   calculateMarkerScale(zoom) {
     const baseScale = 0.02;
     const minZoom = 8;
-    const maxZoom = 19;
+    const maxZoom = 20;
     const scaleRatio = 1.3;
     const zoomLevel = Math.max(minZoom, Math.min(maxZoom, zoom));
     const scaleFactor = Math.pow(scaleRatio, zoomLevel - minZoom);
@@ -97,7 +97,7 @@ export default class Marker {
   }
   calculateOffsetY(zoom) {
     let offsetY = (zoom - 11) * 4.5 - 1;
-    const minOff = 5;
+    const minOff = 7;
     const maxOff = 30;
     offsetY = Math.max(minOff, Math.min(maxOff, offsetY));
     return offsetY;
@@ -110,16 +110,23 @@ export default class Marker {
     return `${fontSize}px Tahoma`
   }
 
+  caculateFontColor(zoom) {
+    
+    return 800/(this.sog*6+60)<zoom-2.5 ?(this.stroke):'rgba(0, 0, 0, 0)';
+
+  }
+
   updateSize(zoom) {
     this.style.getImage().setScale(this.calculateMarkerScale(zoom));
     this.shipName.setOffsetY(this.calculateOffsetY(zoom));
     this.shipName.setFont(this.caculateFontSize(zoom));
+    this.style.getText().getFill().setColor(this.caculateFontColor(zoom));
   }
 
   updateMarker(cog, sog, time) {
     this.cog = cog;
     this.sog = sog;
-    // this.time = time;
+    this.time = time;
   }
 
   getFeature(){

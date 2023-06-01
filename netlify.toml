@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/.websocket"
+  to = "ws://10.125.121.205:9001"
+  status = 101
+  force = true

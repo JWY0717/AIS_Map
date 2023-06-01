@@ -3,18 +3,21 @@ import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
 import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
-import { transform } from 'ol/proj';
 import { Vector as VectorLayer } from 'ol/layer';
 import { Vector as VectorSource } from 'ol/source';
 import Marker from './Marker';
 import proto from './proto2'
 
 const extent = [13967488.396764, 3840850.295080, 14482255.536724, 4668126.023685];
+const vectorSource = new VectorSource();
 const map = new Map({
   layers: [
     new TileLayer({
       source: new OSM(),
     }),
+    new VectorLayer({
+      source: vectorSource
+    })
   ],
   target: 'map',
   view: new View({
@@ -26,18 +29,10 @@ const map = new Map({
   }),
 });
 
-const vectorSource = new VectorSource();
-const vectorLayer = new VectorLayer({
-  source: vectorSource,
-});
-map.addLayer(vectorLayer);
-
+const mkey = new Set([0]);
 const markers = new Array(new Marker(
   'Bogol-E', 100, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource
 ));
-
-const mkey = new Set([0]);
-
 
 function animateMarkers() {
   let nowTime = Date.now();
@@ -46,11 +41,9 @@ function animateMarkers() {
     marker.updatePosition(marker.sog, marker.cog, nowTime);
   }
 }
-map.on('postcompose', animateMarkers);
 let animationPaused = false;
+map.on('postcompose', animateMarkers);
 
-
-// 디바운스
 function debounce(func, delay) {
   let timeoutId;
   return function (...args) {
@@ -66,7 +59,6 @@ const debouncedEventHandler = debounce(function (event) {
   for (let key of mkey) {
     markers[key].updateSize(zoomLevel)
   }
-
   if (zoomLevel <= 12) {
     if (!animationPaused) {
       animationPaused = true;
@@ -74,16 +66,14 @@ const debouncedEventHandler = debounce(function (event) {
     }
   } else {
     if (animationPaused) {
-      map.on('postcompose', animateMarkers);
       animationPaused = false;
+      map.on('postcompose', animateMarkers);
     }
   }
 }, 200);
-
 map.getView().on('change:resolution', debouncedEventHandler);
 
-
-const AIS_SERVER = "ws://localhost:9001"
+const AIS_SERVER = "ws://58.78.120.74:9001"
 const socket = new WebSocket(AIS_SERVER);
 socket.binaryType = "arraybuffer"; 
 socket.onopen = function () {
@@ -99,7 +89,6 @@ socket.onmessage = function (msg) {
       let realData = new Uint8Array(array3);
       let ais = proto.web_gis.AIS_BASE.decode(realData);
       let key = ais.mmsi;
-
       if (mkey.has(key)) {
         markers[key].updateMarker(ais.cog, ais.sog, Date.now())
         markers[key].feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
@@ -114,7 +103,6 @@ socket.onmessage = function (msg) {
     console.log(error);
   }
 };
-
 socket.onclose = function () {
   console.log("웹 소켓 연결이 닫혔습니다.");
 };

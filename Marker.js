@@ -15,7 +15,7 @@ const white = "#FFFFFF";
 export default class Marker {
   constructor(shipName, shipType, cog, sog, posX, posY, time, map, vectorSource) {
     this.render = true;
-    this.shipName = shipName 
+    this.shipName = shipName
     this.sog = sog;
     this.cog = cog;
     this.time = time;
@@ -23,26 +23,21 @@ export default class Marker {
       geometry: new Point([posX, posY]),
     });
     let fill, stroke;
-    sog > 22 ? fill = red : sog > 17 ? fill = orange : sog > 13 ? fill = yellow : sog > 9 ?
-      fill = green : sog > 5 ? fill = blue : sog > 3 ? fill = indigo : sog > 1 ? fill = violet : fill = black;
-
-    shipType > 90 ? stroke = red : shipType > 80 ? stroke = orange : shipType > 70 ? stroke = yellow : shipType > 60 ?
-      stroke = green : shipType > 40 ? stroke = blue : shipType > 20 ? stroke = indigo : shipType > 1 ? stroke = violet : stroke = black;
-
-    let svgShip = `
-    <svg width="120" height="167" viewBox="0 0 120 167" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M11.117 152.487L60 16.282L108.883 152.487L63.0857 121.447L60 119.356L56.9143 121.447L11.117 152.487Z" fill="${fill}" stroke="${stroke}" stroke-width="11"/>
-    </svg>
-    `;
-    const svgStop = `
-    <svg width="93" height="93" viewBox="0 0 93 93" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="46.5" cy="46.5" r="41.5" fill="${fill}" stroke="${stroke}" stroke-width="10"/>
-    </svg>
-    `;
+    sog > 22 ? fill = red : sog > 17 ? fill = orange : sog > 13 ? fill = yellow : sog > 9 ? fill = green 
+    : sog > 5 ? fill = blue : sog > 3 ? fill = indigo : sog > 1 ? fill = violet : fill = black;
+    shipType > 90 ? stroke = red : shipType > 80 ? stroke = orange : shipType > 70 ? stroke = yellow 
+    : shipType > 60 ? stroke = green : shipType > 40 ? stroke = blue : shipType > 20 ? stroke = indigo 
+    : shipType > 1 ? stroke = violet : stroke = black;
     this.stroke = stroke;
     this.fill = fill;
     let svgUrl = ''
-    sog < 2 ? svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgStop)}` : svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgShip)}`;
+    let svgShip = `<svg width="120" height="167" viewBox="0 0 120 167" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.117 152.487L60 16.282L108.883 152.487L63.0857 121.447L60 119.356L56.9143 121.447L11.117 152.487Z" 
+    fill="${fill}" stroke="${stroke}" stroke-width="11"/></svg>`;
+    const svgStop = `<svg width="93" height="93" viewBox="0 0 93 93" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="46.5" cy="46.5" r="41.5" fill="${fill}" stroke="${stroke}" stroke-width="10"/></svg>`;
+    sog < 2 ? svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgStop)}`
+      : svgUrl = `data:image/svg+xml;utf8,${encodeURIComponent(svgShip)}`;
 
     let zoom = map.getView().getZoom();
     this.shipName = new Text({
@@ -95,6 +90,7 @@ export default class Marker {
     scale = Math.max(minScale, Math.min(maxScale, scale));
     return scale;
   }
+
   calculateOffsetY(zoom) {
     let offsetY = (zoom - 11) * 4.5 - 1;
     const minOff = 7;
@@ -111,9 +107,7 @@ export default class Marker {
   }
 
   caculateFontColor(zoom) {
-    
-    return 800/(this.sog*6+60)<zoom-2.5 ?(this.stroke):'rgba(0, 0, 0, 0)';
-
+    return 800 / (this.sog * 6 + 60) < zoom - 2.5 ? (this.stroke) : 'rgba(0, 0, 0, 0)';
   }
 
   updateSize(zoom) {
@@ -129,8 +123,8 @@ export default class Marker {
     this.time = time;
   }
 
-  getFeature(){
-    this.render=false;
+  getFeature() {
+    this.render = false;
     return this.feature;
   }
 }

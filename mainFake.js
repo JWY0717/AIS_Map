@@ -39,6 +39,7 @@ const markers = new Array(new Marker(
   'Bogol-E', 100, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource
 ));
 
+
 function makeFakeShip(right, up, count, reange) {
   const words =   ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape',
   'honeydew', 'kiwi', 'lemon', 'mango', 'nectarine', 'orange', 'peach',
@@ -54,7 +55,7 @@ function makeFakeShip(right, up, count, reange) {
   'oat', 'quinoa', 'rice', 'rye', 'sorghum', 'wheat', 'bagel', 'croissant'];
   const now = Date.now()
   for (let i = 0; i < count; i++) {
-    let speed = (Math.random() * 70) -50;
+    let speed = (Math.random() * 7000) -50;
     let ais = {
       shipName: words[Math.floor(Math.random() * words.length)],
       shipType : Math.random()*100,
@@ -77,6 +78,7 @@ makeFakeShip(12000, -8000, 2*50, 8*4000)
 makeFakeShip(29000, -7000, 2*50, 8*4000)
 makeFakeShip(16000, -6000, 2*50, 8*4000)
 makeFakeShip(120000,350000,3000, 600000)
+
 
 function animateMarkers() {
   let nowTime = Date.now();

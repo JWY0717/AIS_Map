@@ -36,15 +36,14 @@ map.addLayer(vectorLayer);
 
 const mkey = new Set([0]);
 const markers = new Array(new Marker(
-  'Bogol-E', 100, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource
+  'Bogol-E', 100, 75, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource
 ));
-
 
 function animateMarkers() {
   let nowTime = Date.now();
   for (let key of mkey) {
     const marker = markers[key]
-    marker.updatePosition(marker.sog, marker.cog, nowTime);
+    marker.updatePosition(marker.sog, marker.trueheading, nowTime);
   }
 }
 
@@ -97,12 +96,12 @@ socket.onmessage = function (msg) {
       let ais = proto.web_gis.AIS_BASE.decode(realData);
       let key = ais.mmsi;
       if (mkey.has(key)) {
-        markers[key].updateMarker(ais.cog, ais.sog, Date.now())
+        markers[key].updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now())
         markers[key].feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
       } else {
         mkey.add(key)
         markers[key] = new Marker(
-          ais.shipName || "unKnown", ais.shipType, ais.cog, ais.sog,
+          ais.shipName || "unKnown", ais.shipType, ais,trueheading, ais.cog, ais.sog,
           ais.posX, ais.posY, Date.now(), map, vectorSource)
       }
     }

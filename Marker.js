@@ -13,9 +13,10 @@ const black = "#000000";
 const white = "#FFFFFF";
 
 export default class Marker {
-  constructor(shipName, shipType, cog, sog, posX, posY, time, map, vectorSource) {
+  constructor(shipName, shipType, trueheading, cog, sog, posX, posY, time, map, vectorSource) {
     this.render = true;
-    this.shipName = shipName
+    this.shipName = shipName;
+    this.trueheading = trueheading;
     this.sog = sog;
     this.cog = cog;
     this.time = time;
@@ -62,13 +63,13 @@ export default class Marker {
     vectorSource.addFeature(this.feature)
   }
 
-  updatePosition(sog, cog, now) {
+  updatePosition(sog, trueheading, now) {
     const passTime = (now - this.time) / 1000; // 현재 시간과 마커의 시간 차이 (초 단위)
     // if (passTime > 0.05) { // 랜더링 성능제한
     const coordinates = this.feature.getGeometry().getCoordinates();
     const speed = sog * 1.852 * 1000 / 3600; // 초당 이동 속도 (미터 기준)
     const distance = speed * passTime; // 이동해야 할 거리 (미터 기준)
-    const angleRad = (90 - cog) * (Math.PI / 180);
+    const angleRad = (90 - trueheading) * (Math.PI / 180);
     const deltaX = Math.cos(angleRad) * distance;
     const deltaY = Math.sin(angleRad) * distance;
     const newCoordinates = [coordinates[0] + deltaX, coordinates[1] + deltaY];
@@ -117,7 +118,8 @@ export default class Marker {
     this.style.getText().getFill().setColor(this.caculateFontColor(zoom));
   }
 
-  updateMarker(cog, sog, time) {
+  updateMarker(trueheading, cog, sog, time) {
+    this.trueheading = trueheading;
     this.cog = cog;
     this.sog = sog;
     this.time = time;

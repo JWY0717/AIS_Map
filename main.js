@@ -54,13 +54,14 @@ function makeFakeShip(right, up, count, reange) {
   'oat', 'quinoa', 'rice', 'rye', 'sorghum', 'wheat', 'bagel', 'croissant'];
   const now = Date.now()
   for (let i = 0; i < count; i++) {
+    let speed = (Math.random() * 70) -50;
     let ais = {
       shipName: words[Math.floor(Math.random() * words.length)],
       shipType : Math.random()*100,
       mmsi: Math.floor(Math.random( )*1000000),
       posX: 14363620.688750563 + right - Math.random() * reange, 
       posY: 4171752.3092421135 + up - Math.random() * reange,
-      sog: Math.random() * 300,
+      sog: (speed<0)?0:speed,
       cog: Math.random() * 360,
       time: now,
     }
@@ -70,12 +71,12 @@ function makeFakeShip(right, up, count, reange) {
       ais.posX, ais.posY, now, map, vectorSource)
   }
 }
-makeFakeShip(1500, 2000, 10, 1000)
-makeFakeShip(2900, 1000, 20, 3000)
-makeFakeShip(2000, -2000, 50, 4000)
-makeFakeShip(-1000, -2000, 50, 4000)
-makeFakeShip(6000, -1000, 50, 4000)
-makeFakeShip(120000, 350000, 3000, 600000)
+makeFakeShip(21500, -8500, 2*10, 8*1000)
+makeFakeShip(32900, -1500, 2*20, 8*3000)
+makeFakeShip(12000, -8000, 2*50, 8*4000)
+makeFakeShip(29000, -7000, 2*50, 8*4000)
+makeFakeShip(16000, -6000, 2*50, 8*4000)
+makeFakeShip(120000,350000,3000, 600000)
 
 function animateMarkers() {
   let nowTime = Date.now();

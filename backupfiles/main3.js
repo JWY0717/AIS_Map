@@ -39,43 +39,6 @@ const markers = new Array(new Marker(
   'Bogol-E', 100, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource
 ));
 
-function makeFakeShip(right, up, count, reange) {
-  const words =   ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape',
-  'honeydew', 'kiwi', 'lemon', 'mango', 'nectarine', 'orange', 'peach',
-  'quince', 'raspberry', 'strawberry', 'tangerine', 'watermelon', 'apricot',
-  'blueberry', 'coconut', 'dragonfruit', 'grapefruit', 'huckleberry', 'jackfruit',
-  'kiwifruit', 'lime', 'mulberry', 'papaya', 'persimmon', 'plum', 'pomegranate',
-  'rhubarb', 'starfruit', 'tomato', 'ugli', 'yuzu', 'boysenberry', 'cranberry',
-  'durian', 'feijoa', 'guava', 'honeyberry', 'imbe', 'jabuticaba', 'kiwano',
-  'loquat', 'mandarin', 'nance', 'olive', 'pawpaw', 'quenepa', 'rambutan',
-  'soursop', 'tamarind', 'uvaia', 'vanilla', 'wampee', 'xigua', 'yumberry',
-  'zucchini', 'almond', 'cashew', 'chestnut', 'date', 'hazelnut', 'macadamia',
-  'pecan', 'pistachio', 'walnut', 'amaranth', 'barley', 'buckwheat', 'corn',
-  'oat', 'quinoa', 'rice', 'rye', 'sorghum', 'wheat', 'bagel', 'croissant'];
-  const now = Date.now()
-  for (let i = 0; i < count; i++) {
-    let ais = {
-      shipName: words[Math.floor(Math.random() * words.length)],
-      shipType : Math.random()*100,
-      mmsi: Math.floor(Math.random( )*1000000),
-      posX: 14363620.688750563 + right - Math.random() * reange, 
-      posY: 4171752.3092421135 + up - Math.random() * reange,
-      sog: Math.random() * 300,
-      cog: Math.random() * 360,
-      time: now,
-    }
-    mkey.add(ais.mmsi)
-    markers[ais.mmsi] = new Marker(
-      ais.shipName || "unKnown", ais.shipType, ais.cog, ais.sog,
-      ais.posX, ais.posY, now, map, vectorSource)
-  }
-}
-makeFakeShip(1500, 2000, 10, 1000)
-makeFakeShip(2900, 1000, 20, 3000)
-makeFakeShip(2000, -2000, 50, 4000)
-makeFakeShip(-1000, -2000, 50, 4000)
-makeFakeShip(6000, -1000, 50, 4000)
-makeFakeShip(120000, 350000, 3000, 600000)
 
 function animateMarkers() {
   let nowTime = Date.now();
@@ -119,7 +82,7 @@ map.getView().on('change:resolution', debouncedEventHandler);
 
 const AIS_SERVER = "ws://10.125.121.205:9001"
 const socket = new WebSocket(AIS_SERVER);
-socket.binaryType = "arraybuffer";
+socket.binaryType = "arraybuffer"; 
 socket.onopen = function () {
   console.log("웹 소켓 연결이 열렸습니다.");
 };
@@ -139,7 +102,7 @@ socket.onmessage = function (msg) {
       } else {
         mkey.add(key)
         markers[key] = new Marker(
-          ais.shipName || "unKnown", ais.shipType, ais.cog, ais.sog,
+          ais.shipName||"unKnown", ais.shipType, ais.cog, ais.sog,
           ais.posX, ais.posY, Date.now(), map, vectorSource)
       }
     }

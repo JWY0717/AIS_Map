@@ -63,15 +63,24 @@ export default class Marker {
     vectorSource.addFeature(this.feature)
   }
 
+  // 새로 들어온 신호가 이미 피처가 존재할 경우 새로들어온 좌표로 피처 이동 후 이걸로 속성 교체
+  updateMarker(trueheading, cog, sog, time) {
+    this.trueheading = trueheading;
+    this.cog = cog;
+    this.sog = sog;
+    this.time = time;
+  }
+
   updatePosition(sog, trueheading, now) {
-    const passTime = (now - this.time) / 1000; // 현재 시간과 마커의 시간 차이 (초 단위)
+    const elapsed = (now - this.time) / 1000;
     // if (passTime > 0.05) { // 랜더링 성능제한
-    const coordinates = this.feature.getGeometry().getCoordinates();
-    const speed = sog * 1.852 * 1000 / 3600; // 초당 이동 속도 (미터 기준)
-    const distance = speed * passTime; // 이동해야 할 거리 (미터 기준)
+    const speed = sog * 1.852 * 1000 / 3600; // 노트 => m/s 
+    const distance = speed * elapsed; 
     const angleRad = (90 - trueheading) * (Math.PI / 180);
     const deltaX = Math.cos(angleRad) * distance;
     const deltaY = Math.sin(angleRad) * distance;
+    // 3857 좌표 쓰는 이유
+    const coordinates = this.feature.getGeometry().getCoordinates();
     const newCoordinates = [coordinates[0] + deltaX, coordinates[1] + deltaY];
     this.feature.getGeometry().setCoordinates(newCoordinates);
     this.time = now;
@@ -92,41 +101,30 @@ export default class Marker {
     return scale;
   }
 
-  calculateOffsetY(zoom) {
-    let offsetY = (zoom - 11) * 4.5 - 1;
-    const minOff = 7;
-    const maxOff = 30;
-    offsetY = Math.max(minOff, Math.min(maxOff, offsetY));
-    return offsetY;
-  }
-
-  caculateFontSize(zoom) {
-    const minFont = 10;
-    const maxFont = 20;
-    const fontSize = Math.max(minFont, Math.min(maxFont, (zoom - 12) * 2 + 12));
-    return `${fontSize}px Tahoma`
-  }
-
-  caculateFontColor(zoom) {
-    return 800 / (this.sog * 6 + 60) < zoom - 2.5 ? (this.stroke) : 'rgba(0, 0, 0, 0)';
-  }
-
+  // 지도 축척에 따라 마커 변화
   updateSize(zoom) {
     this.style.getImage().setScale(this.calculateMarkerScale(zoom));
     this.shipName.setOffsetY(this.calculateOffsetY(zoom));
     this.shipName.setFont(this.caculateFontSize(zoom));
     this.style.getText().getFill().setColor(this.caculateFontColor(zoom));
   }
-
-  updateMarker(trueheading, cog, sog, time) {
-    this.trueheading = trueheading;
-    this.cog = cog;
-    this.sog = sog;
-    this.time = time;
+  calculateOffsetY(zoom) {
+    let offsetY = (zoom - 11) * 4.5 + 1;
+    const minOff = 7;
+    const maxOff = 30;
+    offsetY = Math.max(minOff, Math.min(maxOff, offsetY));
+    return offsetY;
+  }
+  caculateFontSize(zoom) {
+    const minFont = 10;
+    const maxFont = 20;
+    const fontSize = Math.max(minFont, Math.min(maxFont, (zoom - 12) * 2 + 12));
+    return `${fontSize}px Tahoma`
+  }
+  caculateFontColor(zoom) {
+    return 800 / (this.sog * 6 + 60) < zoom - 2.5 ? (this.stroke) : 'rgba(0, 0, 0, 0)';
   }
 
-  getFeature() {
-    this.render = false;
-    return this.feature;
-  }
+
+  
 }

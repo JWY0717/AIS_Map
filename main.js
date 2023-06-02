@@ -29,6 +29,11 @@ const map = new Map({
   }),
 });
 
+const vectorLayer = new VectorLayer({
+  source: vectorSource,
+});
+map.addLayer(vectorLayer);
+
 const mkey = new Set([0]);
 const markers = new Array(new Marker(
   'Bogol-E', 100, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource
@@ -73,7 +78,7 @@ const debouncedEventHandler = debounce(function (event) {
 }, 200);
 map.getView().on('change:resolution', debouncedEventHandler);
 
-const AIS_SERVER = "ws://58.78.120.74:9001"
+const AIS_SERVER = "ws://localhost:9001"
 const socket = new WebSocket(AIS_SERVER);
 socket.binaryType = "arraybuffer"; 
 socket.onopen = function () {

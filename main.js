@@ -84,7 +84,7 @@ function animateMarkers() {
 }
 
 let animationPaused = false;
-map.on('postcompose', animateMarkers);
+// map.on('postcompose', animateMarkers);
 
 function debounce(func, delay) {
   let timeoutId;
@@ -113,7 +113,7 @@ const debouncedEventHandler = debounce(function (event) {
     }
   }
 }, 200);
-map.getView().on('change:resolution', debouncedEventHandler);
+// map.getView().on('change:resolution', debouncedEventHandler);
 
 const AIS_SERVER = "ws://192.168.219.107:9001"
 const socket = new WebSocket(AIS_SERVER);

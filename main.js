@@ -135,10 +135,10 @@ socket.onmessage = function (msg) {
         markers[key].updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now())
         markers[key].feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
       } else {
-        mkey.add(key)
         markers[key] = new Marker(
           ais.shipName || "unKnown", ais.shipType, ais.trueheading, ais.cog, ais.sog,
           ais.posX, ais.posY, Date.now(), map, vectorSource)
+        mkey.add(key)
       }
     }
   } catch (error) {

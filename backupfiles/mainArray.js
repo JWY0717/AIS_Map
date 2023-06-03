@@ -73,12 +73,7 @@ function makeFakeShip(right, up, count, reange) {
       ais.posX, ais.posY, now, map, vectorSource)
   }
 }
-makeFakeShip(21500, -8500, 2*10, 8*1000)
-makeFakeShip(32900, -1500, 2*20, 8*3000)
-makeFakeShip(12000, -8000, 2*50, 8*4000)
-makeFakeShip(29000, -7000, 2*50, 8*4000)
-makeFakeShip(16000, -6000, 2*50, 8*4000)
-makeFakeShip(120000,350000,3000, 600000)
+// makeFakeShip(120000,350000,3000, 600000)
 
 function animateMarkers() {
   let nowTime = Date.now();
@@ -120,7 +115,7 @@ const debouncedEventHandler = debounce(function (event) {
 }, 200);
 map.getView().on('change:resolution', debouncedEventHandler);
 
-const AIS_SERVER = "ws://10.125.121.205:9001"
+const AIS_SERVER = "ws://192.168.219.107:9001"
 const socket = new WebSocket(AIS_SERVER);
 socket.binaryType = "arraybuffer";
 socket.onopen = function () {

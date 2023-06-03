@@ -1,5 +1,5 @@
 import 'ol/ol.css';
-import { Map as Omap } from 'ol';
+import Map from 'ol/Map';
 import OSM from 'ol/source/OSM';
 import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
@@ -10,7 +10,7 @@ import proto from './proto2'
 
 const extent = [13967488.396764, 3840850.295080, 14482255.536724, 4668126.023685];
 const vectorSource = new VectorSource();
-const map = new Omap({
+const map = new Map({
   layers: [
     new TileLayer({
       source: new OSM(),
@@ -34,11 +34,10 @@ const vectorLayer = new VectorLayer({
 });
 map.addLayer(vectorLayer);
 
-const markers = new Map();
-
-markers.set(1, new Marker(
-  'Bogol-E', 100, 75, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource))
-
+const mkey = new Set([0]);
+const markers = new Array(new Marker(
+  'Bogol-E', 100, 75, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource
+));
 
 function makeFakeShip(right, up, count, reange) {
   const words =   ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape',
@@ -55,7 +54,7 @@ function makeFakeShip(right, up, count, reange) {
   'oat', 'quinoa', 'rice', 'rye', 'sorghum', 'wheat', 'bagel', 'croissant'];
   const now = Date.now()
   for (let i = 0; i < count; i++) {
-    const speed = (Math.random() * 700) -50;
+    const speed = (Math.random() * 7000) -50;
     const cog = Math.random() * 360;
     let ais = {
       shipName: words[Math.floor(Math.random() * words.length)],
@@ -68,19 +67,20 @@ function makeFakeShip(right, up, count, reange) {
       trueheading: cog,
       time: now,
     }
-    markers.set(ais.mmsi, new Marker(
+    mkey.add(ais.mmsi)
+    markers[ais.mmsi] = new Marker(
       ais.shipName || "unKnown", ais.shipType, ais.trueheading, ais.cog, ais.sog,
-      ais.posX, ais.posY, now, map, vectorSource))
+      ais.posX, ais.posY, now, map, vectorSource)
   }
 }
-// makeFakeShip(21500, -8500, 2*10, 8*1000)
-
+// makeFakeShip(120000,350000,3000, 600000)
 
 function animateMarkers() {
   let nowTime = Date.now();
-  markers.forEach(marker=>{
+  for (let key of mkey) {
+    const marker = markers[key]
     marker.updatePosition(marker.sog, marker.trueheading, nowTime);
-  })
+  }
 }
 
 let animationPaused = false;
@@ -98,9 +98,9 @@ function debounce(func, delay) {
 
 const debouncedEventHandler = debounce(function (event) {
   const zoomLevel = map.getView().getZoom();
-  markers.forEach(marker=>{
-    marker.updateSize(zoomLevel)
-  })
+  for (let key of mkey) {
+    markers[key].updateSize(zoomLevel)
+  }
   if (zoomLevel <= 11) {
     if (!animationPaused) {
       animationPaused = true;
@@ -131,13 +131,14 @@ socket.onmessage = function (msg) {
       let realData = new Uint8Array(array3);
       let ais = proto.web_gis.AIS_BASE.decode(realData);
       let key = ais.mmsi;
-      if (markers.has(key)) {
-        markers.get(key).updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now())
-        markers.get(key).feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
+      if (mkey.has(key)) {
+        markers[key].updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now())
+        markers[key].feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
       } else {
-        markers.set(key, new Marker(
-          ais.shipName || "unKnown", ais.shipType, ais.trueHeading, ais.cog, ais.sog,
-          ais.posX, ais.posY, Date.now(), map, vectorSource))
+        markers[key] = new Marker(
+          ais.shipName || "unKnown", ais.shipType, ais.trueheading, ais.cog, ais.sog,
+          ais.posX, ais.posY, Date.now(), map, vectorSource)
+        mkey.add(key)
       }
     }
   } catch (error) {

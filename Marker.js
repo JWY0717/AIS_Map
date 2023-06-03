@@ -24,11 +24,11 @@ export default class Marker {
       geometry: new Point([posX, posY]),
     });
     let fill, stroke;
-    sog > 22 ? fill = red : sog > 17 ? fill = orange : sog > 13 ? fill = yellow : sog > 9 ? fill = green
-      : sog > 5 ? fill = blue : sog > 3 ? fill = indigo : sog > 1 ? fill = violet : fill = black;
-    shipType > 90 ? stroke = red : shipType > 80 ? stroke = orange : shipType > 70 ? stroke = yellow
-      : shipType > 60 ? stroke = green : shipType > 40 ? stroke = blue : shipType > 20 ? stroke = indigo
-        : shipType > 1 ? stroke = violet : stroke = black;
+    sog > 22 ? fill = red : sog > 17 ? fill = orange : sog > 13 ? fill = yellow : sog > 9 ? fill = green 
+    : sog > 5 ? fill = blue : sog > 3 ? fill = indigo : sog > 1 ? fill = violet : fill = black;
+    shipType > 90 ? stroke = red : shipType > 80 ? stroke = orange : shipType > 70 ? stroke = yellow 
+    : shipType > 60 ? stroke = green : shipType > 40 ? stroke = blue : shipType > 20 ? stroke = indigo 
+    : shipType > 1 ? stroke = violet : stroke = black;
     this.stroke = stroke;
     this.fill = fill;
     let svgUrl = ''
@@ -60,34 +60,31 @@ export default class Marker {
       text: this.shipName,
     });
     this.feature.setStyle(this.style);
-    vectorSource.addFeature(this.feature);
-    this.render = true;
+    vectorSource.addFeature(this.feature)
   }
 
   // 새로 들어온 신호가 이미 피처가 존재할 경우 새로들어온 좌표로 피처 이동 후 이걸로 속성 교체
   updateMarker(trueheading, cog, sog, time) {
-    if (this.render) {
-      this.trueheading = trueheading;
-      this.cog = cog;
-      this.sog = sog;
-      this.time = time;
-    }
+    this.trueheading = trueheading;
+    this.cog = cog;
+    this.sog = sog;
+    this.time = time;
   }
 
   updatePosition(sog, trueheading, now) {
     const elapsed = (now - this.time) / 1000;
-    if (this.render && elapsed >= 1/60){
-      const speed = sog * 1.852 * 1000 / 3600; // 노트 => m/s 
-      const distance = speed * elapsed;
-      const angleRad = (90 - trueheading) * (Math.PI / 180);
-      const deltaX = Math.cos(angleRad) * distance;
-      const deltaY = Math.sin(angleRad) * distance;
-      // 3857 좌표 쓰는 이유
-      const coordinates = this.feature.getGeometry().getCoordinates();
-      const newCoordinates = [coordinates[0] + deltaX, coordinates[1] + deltaY];
-      this.feature.getGeometry().setCoordinates(newCoordinates);
-      this.time = now;
-    }
+    // if (passTime > 0.05) { // 랜더링 성능제한
+    const speed = sog * 1.852 * 1000 / 3600; // 노트 => m/s 
+    const distance = speed * elapsed; 
+    const angleRad = (90 - trueheading) * (Math.PI / 180);
+    const deltaX = Math.cos(angleRad) * distance;
+    const deltaY = Math.sin(angleRad) * distance;
+    // 3857 좌표 쓰는 이유
+    const coordinates = this.feature.getGeometry().getCoordinates();
+    const newCoordinates = [coordinates[0] + deltaX, coordinates[1] + deltaY];
+    this.feature.getGeometry().setCoordinates(newCoordinates);
+    this.time = now;
+    // }
   }
 
   calculateMarkerScale(zoom) {
@@ -106,12 +103,10 @@ export default class Marker {
 
   // 지도 축척에 따라 마커 변화
   updateSize(zoom) {
-    if (this.render){
-      this.style.getImage().setScale(this.calculateMarkerScale(zoom));
-      this.shipName.setOffsetY(this.calculateOffsetY(zoom));
-      this.shipName.setFont(this.caculateFontSize(zoom));
-      this.style.getText().getFill().setColor(this.caculateFontColor(zoom));
-    }
+    this.style.getImage().setScale(this.calculateMarkerScale(zoom));
+    this.shipName.setOffsetY(this.calculateOffsetY(zoom));
+    this.shipName.setFont(this.caculateFontSize(zoom));
+    this.style.getText().getFill().setColor(this.caculateFontColor(zoom));
   }
   calculateOffsetY(zoom) {
     let offsetY = (zoom - 11) * 4.5 + 1;
@@ -131,5 +126,5 @@ export default class Marker {
   }
 
 
-
+  
 }

@@ -75,8 +75,8 @@ export default class Marker {
   }
 
   updatePosition(sog, trueheading, now) {
-    if (this.render){
-      const elapsed = (now - this.time) / 1000;
+    const elapsed = (now - this.time) / 1000;
+    if (this.render && elapsed >= 1/60){
       const speed = sog * 1.852 * 1000 / 3600; // 노트 => m/s 
       const distance = speed * elapsed;
       const angleRad = (90 - trueheading) * (Math.PI / 180);

@@ -14,7 +14,7 @@ const white = "#FFFFFF";
 
 export default class Marker {
   constructor(shipName, shipType, trueheading, cog, sog, posX, posY, time, map, vectorSource) {
-    this.render = true;
+    this.stopRenderCounter = 0;
     this.shipName = shipName;
     this.trueheading = trueheading;
     this.sog = sog;

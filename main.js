@@ -41,29 +41,29 @@ const markers = new Array(new Marker(
 ));
 
 function makeFakeShip(right, up, count, reange) {
-  const words =   ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape',
-  'honeydew', 'kiwi', 'lemon', 'mango', 'nectarine', 'orange', 'peach',
-  'quince', 'raspberry', 'strawberry', 'tangerine', 'watermelon', 'apricot',
-  'blueberry', 'coconut', 'dragonfruit', 'grapefruit', 'huckleberry', 'jackfruit',
-  'kiwifruit', 'lime', 'mulberry', 'papaya', 'persimmon', 'plum', 'pomegranate',
-  'rhubarb', 'starfruit', 'tomato', 'ugli', 'yuzu', 'boysenberry', 'cranberry',
-  'durian', 'feijoa', 'guava', 'honeyberry', 'imbe', 'jabuticaba', 'kiwano',
-  'loquat', 'mandarin', 'nance', 'olive', 'pawpaw', 'quenepa', 'rambutan',
-  'soursop', 'tamarind', 'uvaia', 'vanilla', 'wampee', 'xigua', 'yumberry',
-  'zucchini', 'almond', 'cashew', 'chestnut', 'date', 'hazelnut', 'macadamia',
-  'pecan', 'pistachio', 'walnut', 'amaranth', 'barley', 'buckwheat', 'corn',
-  'oat', 'quinoa', 'rice', 'rye', 'sorghum', 'wheat', 'bagel', 'croissant'];
+  const words = ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape',
+    'honeydew', 'kiwi', 'lemon', 'mango', 'nectarine', 'orange', 'peach',
+    'quince', 'raspberry', 'strawberry', 'tangerine', 'watermelon', 'apricot',
+    'blueberry', 'coconut', 'dragonfruit', 'grapefruit', 'huckleberry', 'jackfruit',
+    'kiwifruit', 'lime', 'mulberry', 'papaya', 'persimmon', 'plum', 'pomegranate',
+    'rhubarb', 'starfruit', 'tomato', 'ugli', 'yuzu', 'boysenberry', 'cranberry',
+    'durian', 'feijoa', 'guava', 'honeyberry', 'imbe', 'jabuticaba', 'kiwano',
+    'loquat', 'mandarin', 'nance', 'olive', 'pawpaw', 'quenepa', 'rambutan',
+    'soursop', 'tamarind', 'uvaia', 'vanilla', 'wampee', 'xigua', 'yumberry',
+    'zucchini', 'almond', 'cashew', 'chestnut', 'date', 'hazelnut', 'macadamia',
+    'pecan', 'pistachio', 'walnut', 'amaranth', 'barley', 'buckwheat', 'corn',
+    'oat', 'quinoa', 'rice', 'rye', 'sorghum', 'wheat', 'bagel', 'croissant'];
   const now = Date.now()
   for (let i = 0; i < count; i++) {
-    const speed = (Math.random() * 7000) -50;
+    const speed = (Math.random() * 7000) - 50;
     const cog = Math.random() * 360;
     let ais = {
       shipName: words[Math.floor(Math.random() * words.length)],
-      shipType : Math.random()*100,
-      mmsi: Math.floor(Math.random( )*1000000),
-      posX: 14363620.688750563 + right - Math.random() * reange, 
+      shipType: Math.random() * 100,
+      mmsi: Math.floor(Math.random() * 1000000),
+      posX: 14363620.688750563 + right - Math.random() * reange,
       posY: 4171752.3092421135 + up - Math.random() * reange,
-      sog: (speed<0)?0:speed,
+      sog: (speed < 0) ? 0 : speed,
       cog: cog,
       trueheading: cog,
       time: now,
@@ -134,8 +134,18 @@ socket.onmessage = function (msg) {
       let ais = proto.web_gis.AIS_BASE.decode(realData);
       let key = ais.mmsi;
       if (mkey.has(key)) {
-        markers[key].updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now())
-        markers[key].feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
+        if (ais.sog > 2) {
+          markers[key].updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now());
+          markers[key].feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
+        } else {
+          if (markers[key].stopRenderCounter > 100) {
+            markers[key].updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now());
+            markers[key].feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
+            markers[key].stopRenderCounter = 0;
+          } else {
+            markers[key].stopRenderCounter += 1;
+          }
+        }
       } else {
         markers[key] = new Marker(
           ais.shipName || "unKnown", ais.shipType, ais.trueheading, ais.cog, ais.sog,

@@ -84,8 +84,9 @@ function animateMarkers() {
   }
 }
 
-let animationPaused = false;
-map.on('postcompose', animateMarkers);
+let animationPaused = true;
+// map.on('postcompose', animateMarkers);
+// 모바일 용으로 기본 에니메이션 제거, 줌레벨 기준 11=>15
 
 function debounce(func, delay) {
   let timeoutId;
@@ -102,7 +103,7 @@ const debouncedEventHandler = debounce(function (event) {
   for (let key of mkey) {
     markers[key].updateSize(zoomLevel)
   }
-  if (zoomLevel <= 11) {
+  if (zoomLevel <= 15) {
     if (!animationPaused) {
       animationPaused = true;
       map.un('postcompose', animateMarkers);

@@ -134,7 +134,7 @@ socket.onmessage = function (msg) {
       let ais = proto.web_gis.AIS_BASE.decode(realData);
       let key = ais.mmsi;
       if (mkey.has(key)) {
-        if (ais.sog > 2) {
+        if (ais.sog > 0.5) {
           markers[key].updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now());
           markers[key].feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
         } else {

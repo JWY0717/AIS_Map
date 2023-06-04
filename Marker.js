@@ -90,7 +90,7 @@ export default class Marker {
     // if (passTime > 0.05) { // 랜더링 성능제한
     const speed = this.sog * 1.852 * 1000 / 3600; // 노트 => m/s 
     const distance = speed * elapsed; 
-    const angleRad = (90 - this.trueheading) * (Math.PI / 180);
+    const angleRad = (90 - this.cog) * (Math.PI / 180);
     const deltaX = Math.cos(angleRad) * distance;
     const deltaY = Math.sin(angleRad) * distance;
     // 3857 좌표 쓰는 이유

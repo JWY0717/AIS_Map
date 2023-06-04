@@ -34,6 +34,7 @@ const vectorLayer = new VectorLayer({
 });
 map.addLayer(vectorLayer);
 
+// markers를 객체나 Map 구조 쓰면 에니메이션 마커 순회 시 비동기 생성중인 피쳐 참조해서 문제발생
 const mkey = new Set([0]);
 const markers = new Array(new Marker(
   'Bogol-E', 100, 75, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource
@@ -79,7 +80,7 @@ function animateMarkers() {
   let nowTime = Date.now();
   for (let key of mkey) {
     const marker = markers[key]
-    marker.updatePosition(marker.sog, marker.trueheading, nowTime);
+    marker.updatePosition(nowTime);
   }
 }
 

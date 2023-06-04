@@ -15,6 +15,7 @@ const white = "#FFFFFF";
 export default class Marker {
   constructor(shipName, shipType, trueheading, cog, sog, posX, posY, time, map, vectorSource) {
     this.stopRenderCounter = 0;
+    this.fake = false;
     this.shipName = shipName;
     this.trueheading = trueheading;
     this.sog = sog;
@@ -136,6 +137,7 @@ export default class Marker {
     return `${fontSize}px Tahoma`
   }
   caculateFontColor(zoom) {
+    if (this.fake) return zoom > 11 ? (this.stroke) : 'rgba(0, 0, 0, 0)';
     return 800 / (this.sog * 6 + 60) < zoom - 2.5 ? (this.stroke) : 'rgba(0, 0, 0, 0)';
   }
 

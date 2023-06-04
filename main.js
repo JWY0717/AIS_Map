@@ -55,10 +55,11 @@ function makeFakeShip(right, up, count, reange) {
     'oat', 'quinoa', 'rice', 'rye', 'sorghum', 'wheat', 'bagel', 'croissant'];
   const now = Date.now()
   for (let i = 0; i < count; i++) {
-    const speed = (Math.random() * 7000) - 50;
+    const speed = (Math.random() * 3000) - 50;
     const cog = Math.random() * 360;
     let ais = {
-      shipName: words[Math.floor(Math.random() * words.length)],
+      // shipName: words[Math.floor(Math.random() * words.length)],
+      shipName: "fake",
       shipType: Math.random() * 100,
       mmsi: Math.floor(Math.random() * 1000000),
       posX: 14363620.688750563 + right - Math.random() * reange,
@@ -68,13 +69,14 @@ function makeFakeShip(right, up, count, reange) {
       trueheading: cog,
       time: now,
     }
-    mkey.add(ais.mmsi)
+    mkey.add(ais.mmsi);
     markers[ais.mmsi] = new Marker(
       ais.shipName || "unKnown", ais.shipType, ais.trueheading, ais.cog, ais.sog,
-      ais.posX, ais.posY, now, map, vectorSource)
+      ais.posX, ais.posY, now, map, vectorSource);
+    markers[ais.mmsi].fake = true;
   }
 }
-// makeFakeShip(120000,350000,3000, 600000)
+makeFakeShip(120000, 350000, 3000, 600000)
 
 function animateMarkers() {
   let nowTime = Date.now();
@@ -84,8 +86,8 @@ function animateMarkers() {
   }
 }
 
-let animationPaused = true;
-// map.on('postcompose', animateMarkers);
+let animationPaused = false;
+map.on('postcompose', animateMarkers);
 // 모바일 용으로 기본 에니메이션 제거, 줌레벨 기준 11=>15
 
 function debounce(func, delay) {
@@ -103,7 +105,7 @@ const debouncedEventHandler = debounce(function (event) {
   for (let key of mkey) {
     markers[key].updateSize(zoomLevel)
   }
-  if (zoomLevel <= 15) {
+  if (zoomLevel <= 11) {
     if (!animationPaused) {
       animationPaused = true;
       map.un('postcompose', animateMarkers);

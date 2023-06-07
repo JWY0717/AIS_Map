@@ -34,9 +34,7 @@ const vectorLayer = new VectorLayer({
 });
 map.addLayer(vectorLayer);
 
-const mkey = new Set([1]);
 const markers = new Map();
-
 markers.set(1, new Marker(
   'Bogol-E', 100, 75, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource))
 
@@ -79,12 +77,9 @@ function makeFakeShip(right, up, count, reange) {
 
 function animateMarkers() {
   let nowTime = Date.now();
-  for (let key of mkey) {
-    markers.get(key).updatePosition(nowTime);
-  }
-  // markers.forEach(marker=>{
-  //   marker.updatePosition(marker.sog, marker.trueheading, nowTime);
-  // })
+  markers.forEach(marker=>{
+    marker.updatePosition(nowTime);
+  })
 }
 
 let animationPaused = false;
@@ -142,7 +137,6 @@ socket.onmessage = function (msg) {
         markers.set(key, new Marker(
           ais.shipName || "unKnown", ais.shipType, ais.trueHeading, ais.cog, ais.sog,
           ais.posX, ais.posY, Date.now(), map, vectorSource));
-        mkey.add(key)
       }
     }
   } catch (error) {

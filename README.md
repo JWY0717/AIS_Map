@@ -1,5 +1,6 @@
 # https://Bogol-E.github.io/AIS_Map
 # http://bogol.duckdns.org/
+# http://58.78.120.69:9002/
 > - [ ] 마커
 >> - [x] openlayers 지도 연동
 >> - [x] 대한민국 좌표 범위 제한, 줌레벨 제한, 기본 뷰 설정

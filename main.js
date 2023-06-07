@@ -114,7 +114,7 @@ const debouncedEventHandler = debounce(function (event) {
 }, 200);
 map.getView().on('change:resolution', debouncedEventHandler);
 
-const AIS_SERVER = "ws://58.78.120.74:9001"
+const AIS_SERVER = "ws://58.78.120.69:9001"
 const socket = new WebSocket(AIS_SERVER);
 socket.binaryType = "arraybuffer";
 socket.onopen = function () {

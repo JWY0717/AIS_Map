@@ -1,5 +1,5 @@
 import 'ol/ol.css';
-import Map from 'ol/Map';
+import { Map as Omap } from 'ol';
 import OSM from 'ol/source/OSM';
 import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
@@ -10,7 +10,7 @@ import proto from './proto2'
 
 const extent = [13967488.396764, 3840850.295080, 14482255.536724, 4668126.023685];
 const vectorSource = new VectorSource();
-const map = new Map({
+const map = new Omap({
   layers: [
     new TileLayer({
       source: new OSM(),
@@ -34,61 +34,61 @@ const vectorLayer = new VectorLayer({
 });
 map.addLayer(vectorLayer);
 
-// markers를 객체나 Map 구조 쓰면 에니메이션 마커 순회 시 비동기 생성중인 피쳐 참조해서 문제발생
-const mkey = new Set([0]);
-const markers = new Array(new Marker(
-  'Bogol-E', 100, 75, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource
-));
+const mkey = new Set([1]);
+const markers = new Map();
+
+markers.set(1, new Marker(
+  'Bogol-E', 100, 75, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource))
+
 
 function makeFakeShip(right, up, count, reange) {
-  const words = ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape',
-    'honeydew', 'kiwi', 'lemon', 'mango', 'nectarine', 'orange', 'peach',
-    'quince', 'raspberry', 'strawberry', 'tangerine', 'watermelon', 'apricot',
-    'blueberry', 'coconut', 'dragonfruit', 'grapefruit', 'huckleberry', 'jackfruit',
-    'kiwifruit', 'lime', 'mulberry', 'papaya', 'persimmon', 'plum', 'pomegranate',
-    'rhubarb', 'starfruit', 'tomato', 'ugli', 'yuzu', 'boysenberry', 'cranberry',
-    'durian', 'feijoa', 'guava', 'honeyberry', 'imbe', 'jabuticaba', 'kiwano',
-    'loquat', 'mandarin', 'nance', 'olive', 'pawpaw', 'quenepa', 'rambutan',
-    'soursop', 'tamarind', 'uvaia', 'vanilla', 'wampee', 'xigua', 'yumberry',
-    'zucchini', 'almond', 'cashew', 'chestnut', 'date', 'hazelnut', 'macadamia',
-    'pecan', 'pistachio', 'walnut', 'amaranth', 'barley', 'buckwheat', 'corn',
-    'oat', 'quinoa', 'rice', 'rye', 'sorghum', 'wheat', 'bagel', 'croissant'];
+  const words =   ['apple', 'banana', 'cherry', 'date', 'elderberry', 'fig', 'grape',
+  'honeydew', 'kiwi', 'lemon', 'mango', 'nectarine', 'orange', 'peach',
+  'quince', 'raspberry', 'strawberry', 'tangerine', 'watermelon', 'apricot',
+  'blueberry', 'coconut', 'dragonfruit', 'grapefruit', 'huckleberry', 'jackfruit',
+  'kiwifruit', 'lime', 'mulberry', 'papaya', 'persimmon', 'plum', 'pomegranate',
+  'rhubarb', 'starfruit', 'tomato', 'ugli', 'yuzu', 'boysenberry', 'cranberry',
+  'durian', 'feijoa', 'guava', 'honeyberry', 'imbe', 'jabuticaba', 'kiwano',
+  'loquat', 'mandarin', 'nance', 'olive', 'pawpaw', 'quenepa', 'rambutan',
+  'soursop', 'tamarind', 'uvaia', 'vanilla', 'wampee', 'xigua', 'yumberry',
+  'zucchini', 'almond', 'cashew', 'chestnut', 'date', 'hazelnut', 'macadamia',
+  'pecan', 'pistachio', 'walnut', 'amaranth', 'barley', 'buckwheat', 'corn',
+  'oat', 'quinoa', 'rice', 'rye', 'sorghum', 'wheat', 'bagel', 'croissant'];
   const now = Date.now()
   for (let i = 0; i < count; i++) {
-    const speed = (Math.random() * 3000) - 50;
+    const speed = (Math.random() * 700) -50;
     const cog = Math.random() * 360;
     let ais = {
-      // shipName: words[Math.floor(Math.random() * words.length)],
-      shipName: "fake",
-      shipType: Math.random() * 100,
-      mmsi: Math.floor(Math.random() * 1000000),
-      posX: 14363620.688750563 + right - Math.random() * reange,
+      shipName: words[Math.floor(Math.random() * words.length)],
+      shipType : Math.random()*100,
+      mmsi: Math.floor(Math.random( )*1000000),
+      posX: 14363620.688750563 + right - Math.random() * reange, 
       posY: 4171752.3092421135 + up - Math.random() * reange,
-      sog: (speed < 0) ? 0 : speed,
+      sog: (speed<0)?0:speed,
       cog: cog,
       trueheading: cog,
       time: now,
     }
-    mkey.add(ais.mmsi);
-    markers[ais.mmsi] = new Marker(
+    markers.set(ais.mmsi, new Marker(
       ais.shipName || "unKnown", ais.shipType, ais.trueheading, ais.cog, ais.sog,
-      ais.posX, ais.posY, now, map, vectorSource);
-    markers[ais.mmsi].fake = true;
+      ais.posX, ais.posY, now, map, vectorSource))
   }
 }
-makeFakeShip(120000, 350000, 3000, 600000)
+// makeFakeShip(21500, -8500, 2*10, 8*1000)
+
 
 function animateMarkers() {
   let nowTime = Date.now();
   for (let key of mkey) {
-    const marker = markers[key]
-    marker.updatePosition(nowTime);
+    markers.get(key).updatePosition(nowTime);
   }
+  // markers.forEach(marker=>{
+  //   marker.updatePosition(marker.sog, marker.trueheading, nowTime);
+  // })
 }
 
 let animationPaused = false;
 map.on('postcompose', animateMarkers);
-// 모바일 용으로 기본 에니메이션 제거, 줌레벨 기준 11=>15
 
 function debounce(func, delay) {
   let timeoutId;
@@ -102,9 +102,9 @@ function debounce(func, delay) {
 
 const debouncedEventHandler = debounce(function (event) {
   const zoomLevel = map.getView().getZoom();
-  for (let key of mkey) {
-    markers[key].updateSize(zoomLevel)
-  }
+  markers.forEach(marker=>{
+    marker.updateSize(zoomLevel)
+  })
   if (zoomLevel <= 11) {
     if (!animationPaused) {
       animationPaused = true;
@@ -135,23 +135,13 @@ socket.onmessage = function (msg) {
       let realData = new Uint8Array(array3);
       let ais = proto.web_gis.AIS_BASE.decode(realData);
       let key = ais.mmsi;
-      if (mkey.has(key)) {
-        if (ais.sog > 0.5) {
-          markers[key].updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now());
-          markers[key].feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
-        } else {
-          if (markers[key].stopRenderCounter > 100) {
-            markers[key].updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now());
-            markers[key].feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
-            markers[key].stopRenderCounter = 0;
-          } else {
-            markers[key].stopRenderCounter += 1;
-          }
-        }
+      if (markers.has(key)) {
+        markers.get(key).updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now())
+        markers.get(key).feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
       } else {
-        markers[key] = new Marker(
-          ais.shipName || "unKnown", ais.shipType, ais.trueheading, ais.cog, ais.sog,
-          ais.posX, ais.posY, Date.now(), map, vectorSource)
+        markers.set(key, new Marker(
+          ais.shipName || "unKnown", ais.shipType, ais.trueHeading, ais.cog, ais.sog,
+          ais.posX, ais.posY, Date.now(), map, vectorSource));
         mkey.add(key)
       }
     }

@@ -88,7 +88,7 @@ export default class Marker {
 
   updatePosition(now) {
     const elapsed = (now - this.time) / 1000;
-    // if (passTime > 0.05) { // 랜더링 성능제한
+    // if (elapsed > 0.05) { // 랜더링 성능제한
     const speed = this.sog * 1.852 * 1000 / 3600; // 노트 => m/s 
     const distance = speed * elapsed; 
     const angleRad = (90 - this.cog) * (Math.PI / 180);
@@ -141,6 +141,9 @@ export default class Marker {
     return 800 / (this.sog * 6 + 60) < zoom - 2.5 ? (this.stroke) : 'rgba(0, 0, 0, 0)';
   }
 
+  getfeature() {
+    return this.feature;
+  }
 
   
 }

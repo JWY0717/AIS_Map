@@ -14,8 +14,8 @@ const white = "#FFFFFF";
 
 export default class Marker {
   constructor(shipName, shipType, trueheading, cog, sog, posX, posY, time, map, vectorSource) {
+    this.unKnown = false;
     this.stopRenderCounter = 0;
-    this.fake = false;
     this.shipName = shipName;
     this.trueheading = trueheading;
     this.sog = sog;
@@ -88,7 +88,7 @@ export default class Marker {
 
   updatePosition(now) {
     const elapsed = (now - this.time) / 1000;
-    // if (passTime > 0.05) { // 랜더링 성능제한
+    // if (elapsed > 0.05) { // 랜더링 성능제한
     const speed = this.sog * 1.852 * 1000 / 3600; // 노트 => m/s 
     const distance = speed * elapsed; 
     const angleRad = (90 - this.cog) * (Math.PI / 180);

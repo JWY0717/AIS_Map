@@ -59,14 +59,12 @@ markers.set(1, new Marker(
 function animateMarkers() {
   let nowTime = Date.now();
   markers.forEach(marker => {
-    if (vectorSource.getFeatures().includes(marker.feature)) {
-      marker.updatePosition(nowTime);
-    }
+    marker.updatePosition(nowTime);
   })
 }
 
-let animationPaused = true;
-// map.on('postcompose', animateMarkers);
+let animationPaused = false;
+map.on('postcompose', animateMarkers);
 
 function debounce(func, delay) {
   let timeoutId;
@@ -83,7 +81,7 @@ const debouncedEventHandler = debounce(function (event) {
   markers.forEach(marker => {
     marker.updateSize(zoomLevel)
   })
-  if (zoomLevel <= 13) {
+  if (zoomLevel <= 11) {
     if (!animationPaused) {
       animationPaused = true;
       map.un('postcompose', animateMarkers);
@@ -94,8 +92,7 @@ const debouncedEventHandler = debounce(function (event) {
       map.on('postcompose', animateMarkers);
     }
   }
-}, 500);
-
+}, 200);
 map.getView().on('change:resolution', debouncedEventHandler);
 
 const chatbox = document.getElementById('chatbox');

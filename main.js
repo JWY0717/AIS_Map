@@ -5,8 +5,8 @@ import TileLayer from 'ol/layer/Tile';
 import View from 'ol/View';
 import { Vector as VectorLayer } from 'ol/layer';
 import { Vector as VectorSource } from 'ol/source';
-import Marker from './Marker';
-import proto from './proto2'
+import Marker from './src/Marker';
+import proto from './src/proto2'
 import axios from 'axios';
 
 const extent = [13967488.396764, 3840850.295080, 14482255.536724, 4668126.023685];
@@ -83,7 +83,7 @@ const debouncedEventHandler = debounce(function (event) {
   markers.forEach(marker => {
     marker.updateSize(zoomLevel)
   })
-  if (zoomLevel <= 13) {
+  if (zoomLevel <= 15) {
     if (!animationPaused) {
       animationPaused = true;
       map.un('postcompose', animateMarkers);
@@ -94,7 +94,7 @@ const debouncedEventHandler = debounce(function (event) {
       map.on('postcompose', animateMarkers);
     }
   }
-}, 500);
+}, 200);
 
 map.getView().on('change:resolution', debouncedEventHandler);
 

@@ -47,7 +47,7 @@ markers.set(1, new Marker(
     ships.forEach((ais) => {
       ais.time = now; // 서버랑 싱크가 안맞음
       markers.set(ais.mmsi, new Marker(
-        ais.shipname || "unKnown", ais.shipname, ais.trueheading, ais.cog, ais.sog,
+        ais.shipname || "unKnown", ais.shiptype, ais.trueheading, ais.cog, ais.sog,
         ais.posx, ais.posy, ais.time, map, vectorSource));
     });
   } catch (error) {

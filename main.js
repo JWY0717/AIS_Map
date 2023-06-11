@@ -94,6 +94,11 @@ const debouncedEventHandler = debounce(function (event) {
 }, 200);
 map.getView().on('change:resolution', debouncedEventHandler);
 
+const chatbox = document.getElementById('chatbox');
+function scrollToBottom() {
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
+
 const AIS_SERVER = "ws://58.78.120.69:9001"
 const socket = new WebSocket(AIS_SERVER);
 socket.binaryType = "arraybuffer";
@@ -111,12 +116,23 @@ socket.onmessage = function (msg) {
       let ais = proto.web_gis.AIS_BASE.decode(realData);
       let key = ais.mmsi;
       if (markers.has(key)) {
-        markers.get(key).updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now())
-        markers.get(key).feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
+        let marker = markers.get(key);
+        if (ais.shipName != '' && marker.unKnown) {
+          marker.shipName.setText(ais.shipName);
+          chatbox.innerHTML += '<p class="highlight">' + `[${key}]${ais.shipName}이름 수신` + '</p>';
+          scrollToBottom();
+        }
+        marker.updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now())
+        marker.feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
+        chatbox.innerHTML += '<p>' + `${marker.shipName.getText()} [${key}] 갱신...` + '</p>';
+        scrollToBottom();
       } else {
         markers.set(key, new Marker(
-          ais.shipName || "unKnown", ais.shipType, ais.trueHeading, ais.cog, ais.sog,
+          ais.shipName || "unKnown", ais.shipTye, ais.trueHeading, ais.cog, ais.sog,
           ais.posX, ais.posY, Date.now(), map, vectorSource));
+        if (ais.shipName = '') markers.get(key).unKnown = true;
+        chatbox.innerHTML += '<p class="highlight">' + `${ais.shipName || 'UnKnown'}새롭게 포착!!!!!!` + '</p>';
+        scrollToBottom();
       }
     }
   } catch (error) {

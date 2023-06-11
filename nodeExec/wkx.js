@@ -25,3 +25,5 @@ if (geometry && geometry.toGeoJSON) {
 } else {
   console.log('Invalid geometry data');
 }
+
+console.log(Date.now());

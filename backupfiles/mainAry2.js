@@ -35,20 +35,19 @@ const vectorLayer = new VectorLayer({
 });
 map.addLayer(vectorLayer);
 
-const markers = new Map();
-markers.set(1, new Marker(
+const markers = new Array(new Marker(
   'Bogol-E', 100, 75, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource));
+const keys = new Set([0]);
 
 (async function initializeShips() {
   try {
     const response = await axios.get('http://58.78.120.69/aisdata');
     const ships = response.data;
-    const now = Date.now();
     ships.forEach((ais) => {
-      ais.time = now; // 서버랑 싱크가 안맞음
-      markers.set(ais.mmsi, new Marker(
+      markers[ais.mmsi] = new Marker(
         ais.shipname || "unKnown", ais.shipname, ais.trueheading, ais.cog, ais.sog,
-        ais.posx, ais.posy, ais.time, map, vectorSource));
+        ais.posx, ais.posy, ais.time, map, vectorSource);
+      keys.add(ais.mmsi);
     });
   } catch (error) {
     console.error(error);
@@ -57,9 +56,10 @@ markers.set(1, new Marker(
 
 function animateMarkers() {
   let nowTime = Date.now();
-  markers.forEach(marker => {
+  for (let key of keys) {
+    const marker = markers[key]
     marker.updatePosition(nowTime);
-  })
+  }
 }
 
 let animationPaused = false;
@@ -110,13 +110,14 @@ socket.onmessage = function (msg) {
       let realData = new Uint8Array(array3);
       let ais = proto.web_gis.AIS_BASE.decode(realData);
       let key = ais.mmsi;
-      if (markers.has(key)) {
-        markers.get(key).updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now())
-        markers.get(key).feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
+      if (keys.has(key)) {
+        markers[key].updateMarker(ais.trueheading, ais.cog, ais.sog, Date.now())
+        markers[key].feature.getGeometry().setCoordinates([ais.posX, ais.posY]);
       } else {
-        markers.set(key, new Marker(
+        markers[key] = new Marker(
           ais.shipName || "unKnown", ais.shipType, ais.trueHeading, ais.cog, ais.sog,
-          ais.posX, ais.posY, Date.now(), map, vectorSource));
+          ais.posX, ais.posY, Date.now(), map, vectorSource);
+        keys.add(ais.mmsi);
       }
     }
   } catch (error) {

@@ -1,6 +1,6 @@
 const dns = require('dns');
 
-const domain = 'bogol-e.github.io';
+const domain = 'bogol.duckdns.org';
 
 dns.resolve4(domain, (err, addresses) => {
   if (err) {

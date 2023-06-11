@@ -43,9 +43,12 @@ markers.set(1, new Marker(
   try {
     const response = await axios.get('http://58.78.120.69/aisdata');
     const ships = response.data;
-    ships.forEach((ship) => {
-      const { mmsi, shipName, shipType, trueHeading, cog, sog, posX, posY, time } = ship;
-      markers.set(mmsi, new Marker(shipName, shipType, trueHeading, cog, sog, posX, posY, time, map, vectorSource));
+    ships.forEach((ais) => {
+      console.log(ais);
+      const time = new Date(ais.time).toISOString();
+      markers.set(ais.mmsi, new Marker(
+        ais.shipname || "unKnown", ais.shiptype, ais.trueheading, ais.cog, ais.sog,
+        ais.posx, ais.posy, time, map, vectorSource));
     });
   } catch (error) {
     console.error(error);

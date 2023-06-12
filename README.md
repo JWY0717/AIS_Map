@@ -29,7 +29,7 @@
 >> - [ ] 지도 뷰포인트 저장
 >> - [ ] 운항 일지 저장
 >> - [ ] 게시판 생성. 운항일지 사진등 공유 기능
->> - [ ] 에드센스
+>> - [ ] Docker 패키징, 배포
 
 ```
  npx rollup -c --bundleConfigAsCjs rollup.config.js

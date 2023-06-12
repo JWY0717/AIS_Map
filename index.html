@@ -18,7 +18,7 @@
       width: 20%;
       height: 80vh;
       background-color: rgb(22, 1, 46);
-      border: 5px solid rgb(33, 3, 94);
+      border: 1em solid rgb(33, 3, 94);
       overflow-y: scroll;
       z-index: 999;
       font-size: 0.5em;
@@ -28,6 +28,20 @@
     #chatbox::-webkit-scrollbar {
       width: 0px;
       background: transparent;
+    }
+
+    #listbox {
+      position: absolute;
+      bottom: 2vh;
+      left: 2%;
+      width: 20%;
+      height: 80vh;
+      background-color: rgb(22, 1, 46);
+      border: 1em solid rgb(33, 3, 94);
+      overflow-y: scroll;
+      z-index: 999;
+      font-size: 0.5em;
+      color: greenyellow;
     }
 
     .highlight {
@@ -41,6 +55,7 @@
 <body>
   <div id="map" class="map"></div>
   <div id="chatbox"></div>
+  <div id="listbox"></div>
   <script type="module" src="main.js"></script>
 </body>
 

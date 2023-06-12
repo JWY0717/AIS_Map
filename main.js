@@ -28,7 +28,7 @@ const map = new Omap({
     maxZoom: 20,
     minZoom: 8,
     extent: extent,
-    enableRotation: false, 
+    enableRotation: false,
   }),
 });
 
@@ -37,9 +37,17 @@ const vectorLayer = new VectorLayer({
 });
 map.addLayer(vectorLayer);
 
+const chatbox = document.getElementById('chatbox');
+const listbox = document.getElementById('listbox');
+function scrollToBottom() {
+  chatbox.scrollTop = chatbox.scrollHeight;
+}
+
 const markers = new Map();
 markers.set(1, new Marker(
   'Bogol-E', 100, 75, 75, 500, 14363620, 4158752, Date.now(), map, vectorSource));
+
+listbox.innerHTML += '<p class="highlight">[ 소실 신호 목록 ]</p>';
 
 (async function initializeShips() {
   try {
@@ -47,11 +55,15 @@ markers.set(1, new Marker(
     const ships = response.data;
     const now = Date.now();
     for (const ais of ships) {
-      ais.time = now; // 서버랑 싱크가 안맞음
+      const elapsed = now - ais.time;
+      if (elapsed > -28598701) {
+        listbox.innerHTML += (`<p> ${~~((elapsed+28598701)/60/1000)}분간 소실 &nbsp;&nbsp;&nbsp;&nbsp; ${ais.shipName || "UnKnown"} mmsi:[${ais.mmsi}]</p>`);
+      }
+      ais.time = now; // 서버랑 싱크가 안맞음 일단 임시 떔빵
       markers.set(ais.mmsi, new Marker(
         ais.shipname, ais.shiptype, ais.trueheading, ais.cog, ais.sog,
         ais.posx, ais.posy, ais.time, map, vectorSource));
-    };
+    }
   } catch (error) {
     console.error(error);
   }
@@ -90,12 +102,11 @@ const debouncedZoomHandler = debounce(function () {
 
 map.getView().on('change:resolution', debouncedZoomHandler);
 
-const chatbox = document.getElementById('chatbox');
-function scrollToBottom() {
-  chatbox.scrollTop = chatbox.scrollHeight;
-}
 
-const AIS_SERVER = "ws://58.78.120.69:9001"
+
+// const AIS_SERVER = "ws://bogol.duckdns.org/ws";
+
+const AIS_SERVER = "ws://58.78.120.69:9001";
 let socket;
 
 function connectWebSocket() {
@@ -129,7 +140,7 @@ function connectWebSocket() {
           )
         );
         if (ais.shipName == "") markers.get(key).unKnown = true;
-        chatbox.innerHTML += `<p class="highlight">${ais.shipName || "UnKnown"} 새롭게 포착!!!!!!</p>`;
+        chatbox.innerHTML += `<p class="highlight">${ais.shipName || "UnKnown"} [${key}] 새롭게 포착!!!!!!</p>`;
         scrollToBottom();
       }
     } catch (error) {

@@ -56,18 +56,31 @@ listbox.innerHTML += '<p class="highlight">[ 소실 신호 목록 ]</p>';
     const now = Date.now();
     for (const ais of ships) {
       const elapsed = now - ais.time;
-      if (elapsed > -28598701) {
-        listbox.innerHTML += (`<p> ${~~((elapsed+28598701)/60/1000)}분간 소실 &nbsp;&nbsp;&nbsp;&nbsp; ${ais.shipName || "UnKnown"} mmsi:[${ais.mmsi}]</p>`);
+      if (elapsed > (1000*60*5)) {
+        listbox.innerHTML += (`<p> ${~~((elapsed)/60/1000)}분간 소실 &nbsp;&nbsp;&nbsp;&nbsp; ${ais.shipName || "UnKnown"} [${ais.mmsi}]</p>`);
       }
-      ais.time = now; // 서버랑 싱크가 안맞음 일단 임시 떔빵
       markers.set(ais.mmsi, new Marker(
         ais.shipname, ais.shiptype, ais.trueheading, ais.cog, ais.sog,
         ais.posx, ais.posy, ais.time, map, vectorSource));
     }
+    checkLost();
   } catch (error) {
     console.error(error);
   }
 })();
+
+function checkLost(){
+  let nowTime = Date.now();
+  const zoomLevel = map.getView().getZoom();
+  for (const [_, marker] of markers) {
+    if (nowTime-marker.time>300000) {
+      marker.lost = true;
+      marker.changeLost(zoomLevel);
+    }
+  }
+}
+
+setInterval(checkLost, 10000)
 
 function animateMarkers() {
   let nowTime = Date.now();
@@ -78,8 +91,8 @@ function animateMarkers() {
   }
 }
 
-let animationPaused = true;
-// map.on('postcompose', animateMarkers);
+let animationPaused = false;
+map.on('postcompose', animateMarkers);
 
 const debouncedZoomHandler = debounce(function () {
   const zoomLevel = map.getView().getZoom();
@@ -87,7 +100,7 @@ const debouncedZoomHandler = debounce(function () {
     marker.updateSize(zoomLevel);
   };
 
-  if (zoomLevel <= 15) {
+  if (zoomLevel <= 11.5) {
     if (!animationPaused) {
       animationPaused = true;
       map.un('postcompose', animateMarkers);

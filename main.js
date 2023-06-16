@@ -76,6 +76,7 @@ function checkLost(){
     if (nowTime-marker.time>300000) {
       marker.lost = true;
       marker.changeLost(zoomLevel);
+      
     }
   }
 }
